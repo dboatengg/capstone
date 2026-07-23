@@ -11,3 +11,57 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Agent {
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
+  whatsapp   String?
+  role       String     @default("agent")
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  phone     String?
+  inquiries Inquiry[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Property {
+  id               String    @id @default(uuid())
+  title            String
+  shortDescription String
+  longDescription  String
+  price            Float
+  type             String    // "sale" or "rent"
+  available        Boolean   @default(true)
+  bedrooms         Int
+  bathrooms        Int
+  location         String
+  agentId          String
+  agent            Agent     @relation(fields: [agentId], references: [id])
+  inquiries        Inquiry[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Inquiry {
+  id         String   @id @default(uuid())
+  message    String
+  status     String   @default("pending")
+  clientId   String
+  propertyId String
+  client     Client   @relation(fields: [clientId], references: [id])
+  property   Property @relation(fields: [propertyId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
