@@ -42,7 +42,7 @@ router.put('/:id', validateUpdateAgentMiddleware, async (req, res) => {
 })
   
 // delete agent
-router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
     const agent = await prisma.agent.findUnique({ where: { id } })
     if (!agent) throw new AppError('Agent not found', 404)
