@@ -22,9 +22,9 @@ router.get('/:id', async (req, res) => {
   
 // create agent
 router.post('/', validateAgentMiddleware, async (req, res) => {
-    const { name, email, password, phone, whatsapp, role, properties } = req.body
+    // const { name, email, password, phone, whatsapp, role, properties } = req.body
    
-    const newAgent = await prisma.agent.create({ data: { name, email, password, phone, whatsapp, role, properties }, select: agentSelect });
+    const newAgent = await prisma.agent.create({ data: req.body, select: agentSelect });
     res.status(201).json(newAgent);
   })
   
