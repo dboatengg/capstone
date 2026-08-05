@@ -28,7 +28,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // create inquiry
-router.post('/', requireAuth, validateInquiryMiddleware, async (req, res) => {
+router.post('/', validateInquiryMiddleware, async (req, res) => {
     const clientId = req.user.userId  
     const { propertyId, message } = req.body
     const inquiry = await prisma.inquiry.create({
@@ -38,7 +38,7 @@ router.post('/', requireAuth, validateInquiryMiddleware, async (req, res) => {
   })
 
 // update inquiry
-router.put('/:id', requireAuth, validateUpdateInquiryMiddleware, async (req, res) => {
+router.put('/:id', validateUpdateInquiryMiddleware, async (req, res) => {
     const { id } = req.params
     const inquiry = await prisma.inquiry.findUnique({ where: { id } })
     if (!inquiry) throw new AppError('Inquiry not found', 404)
@@ -50,7 +50,7 @@ router.put('/:id', requireAuth, validateUpdateInquiryMiddleware, async (req, res
 })
 
 // delete inquiry
-router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
     const inquiry = await prisma.inquiry.findUnique({ where: { id } })
     if (!inquiry) throw new AppError('Inquiry not found', 404)

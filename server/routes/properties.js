@@ -37,14 +37,14 @@ router.get('/:id', async (req, res) => {
 })
 
 // create property
-router.post('/', requireAuth, validatePropertyMiddleware, async (req, res) => {
+router.post('/', validatePropertyMiddleware, async (req, res) => {
     const agentId = req.user.userId
     const property = await prisma.property.create({ data: { ...req.body, agentId } })
     res.status(201).json(property);
 })
 
 // update property
-router.put('/:id', requireAuth, validateUpdatePropertyMiddleware, async (req, res) => {
+router.put('/:id', validateUpdatePropertyMiddleware, async (req, res) => {
     const { id } = req.params
     const property = await prisma.property.findUnique({ where: { id } })
     if (!property) throw new AppError('Property not found', 404)
@@ -59,7 +59,7 @@ router.put('/:id', requireAuth, validateUpdatePropertyMiddleware, async (req, re
   })
 
 // delete property
-router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
     const property = await prisma.property.findUnique({ where: { id }, select: propertySelect })
     if (!property) throw new AppError('Property not found', 404)

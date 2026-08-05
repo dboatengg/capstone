@@ -42,7 +42,7 @@ model Property {
   shortDescription String
   longDescription  String
   price            Float
-  type             String    // "sale" or "rent"
+  type             String    
   available        Boolean   @default(true)
   bedrooms         Int
   bathrooms        Int
