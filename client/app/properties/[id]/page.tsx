@@ -1,4 +1,5 @@
 import { getProperty } from '@/lib/api';
+import Link from 'next/link';
 
 export default async function PropertyDetailPage({
   params,
@@ -23,6 +24,9 @@ export default async function PropertyDetailPage({
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
+        <Link href="/properties" className="inline-flex items-center gap-1 text-sm text-[var(--color-ink)]/60 hover:text-[var(--color-forest)] transition-colors mb-6">
+          ← Back to listings
+          </Link>
       {/* Header block — mirrors the card's colored edge + image treatment */}
       <div className="flex border border-[var(--color-stone-line)] overflow-hidden">
         <div
