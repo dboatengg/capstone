@@ -7,6 +7,7 @@ import inquiryRoutes from './routes/inquiries.js'
 import authRoutes from './routes/auth.js'
 import propertyRoutes from './routes/properties.js'
 import errorHandler from './middleware/errorHandler.js'
+import cors from 'cors'
 
 // express app setup
 const app = express();
@@ -14,6 +15,10 @@ const app = express();
 // middleware
 app.use(express.json())
 app.use(morgan('dev'))
+app.use(cors ({
+    origin: 'http://localhost:4000', 
+    credentials: true
+}))
 
 // Auth routes
 app.use('/auth', authRoutes);
