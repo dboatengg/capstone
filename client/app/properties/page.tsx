@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 type Agent = {
   id: string;
   name: string;
@@ -65,7 +67,7 @@ export default async function PropertiesPage() {
       <ul>
         {properties.map((property) => (
           <li key={property.id}>
-            <h2>{property.title}</h2>
+            <Link href={`/properties/${property.id}`}>{property.title}</Link>
             <p>{property.shortDescription}</p>
             <p>GHS {property.price.toLocaleString()}</p>
             <p>{property.bedrooms} bed · {property.bathrooms} bath</p>
