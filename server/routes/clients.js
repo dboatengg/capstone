@@ -2,6 +2,7 @@ import express from 'express'
 import prisma from '../db/prisma.js'
 import { validateClientMiddleware, validateUpdateClientMiddleware } from '../utils/validate.js'
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
+import AppError from '../utils/AppError.js';
 
 const router = express.Router();
 
@@ -47,9 +48,7 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
     const client = await prisma.client.findUnique({ where: { id } })
     if (!client) throw new AppError('Client not found', 404)
     await prisma.client.delete({ where: { id } })
-    res.status(204).send({
-        message: "Client deleted successfully",
-      });
+    res.status(204).send();
 })
   
 export default router

@@ -6,6 +6,7 @@ import clientRoutes from './routes/clients.js'
 import inquiryRoutes from './routes/inquiries.js'
 import authRoutes from './routes/auth.js'
 import propertyRoutes from './routes/properties.js'
+import errorHandler from './middleware/errorHandler.js'
 
 // express app setup
 const app = express();
@@ -26,6 +27,18 @@ app.use('/api/properties', propertyRoutes)
 // root route
 app.get('/', (req, res) => {
     res.send("Welcome to the Capstone API!")
+})
+
+app.use(errorHandler)
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err)
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err)
+  process.exit(1)
 })
 
 export default app;

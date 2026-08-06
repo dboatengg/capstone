@@ -2,6 +2,7 @@ import express from 'express';
 import prisma from '../db/prisma.js';
 import { validatePropertyMiddleware, validateUpdatePropertyMiddleware } from '../utils/validate.js';
 import { requireAuth, requireAdmin, requireAgent, requireClient } from '../middleware/auth.js';
+import AppError from '../utils/AppError.js';
 
 const router = express.Router();   
 
