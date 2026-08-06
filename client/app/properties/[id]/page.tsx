@@ -1,42 +1,4 @@
-type Agent = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  whatsapp: string | null;
-};
-
-type Property = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  longDescription: string;
-  price: number;
-  type: string;
-  available: boolean;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  createdAt: string;
-  updatedAt: string;
-  agent: Agent;
-};
-
-async function getProperty(id: string): Promise<Property | null> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`);
-
-    if (!res.ok) {
-      console.error('Failed to fetch property:', res.status);
-      return null;
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Network error fetching property:', error);
-    return null;
-  }
-}
+import { getProperty } from '@/lib/api';
 
 export default async function PropertyDetailPage({
   params,

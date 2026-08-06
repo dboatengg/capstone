@@ -1,44 +1,5 @@
 import Link from 'next/link';
-
-type Agent = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  whatsapp: string | null;
-};
-
-type Property = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  longDescription: string;
-  price: number;
-  type: string;
-  available: boolean;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  createdAt: string;
-  updatedAt: string;
-  agent: Agent;
-};
-
-async function getProperties(): Promise<Property[] | null> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`);
-
-    if (!res.ok) {
-      console.error('Failed to fetch properties:', res.status);
-      return null;
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Network error fetching properties:', error);
-    return null;
-  }
-}
+import { getProperties } from '@/lib/api';
 
 export default async function PropertiesPage() {
   const properties = await getProperties();
@@ -67,7 +28,9 @@ export default async function PropertiesPage() {
       <ul>
         {properties.map((property) => (
           <li key={property.id}>
-            <Link href={`/properties/${property.id}`}>{property.title}</Link>
+            <h2>
+              <Link href={`/properties/${property.id}`}>{property.title}</Link>
+            </h2>
             <p>{property.shortDescription}</p>
             <p>GHS {property.price.toLocaleString()}</p>
             <p>{property.bedrooms} bed · {property.bathrooms} bath</p>
