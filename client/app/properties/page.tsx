@@ -22,9 +22,42 @@ type Property = {
   agent: Agent;
 };
 
+async function getProperties(): Promise<Property[] | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`);
+
+    if (!res.ok) {
+      console.error('Failed to fetch properties:', res.status);
+      return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Network error fetching properties:', error);
+    return null;
+  }
+}
+
 export default async function PropertiesPage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`);
-  const properties: Property[] = await res.json();
+  const properties = await getProperties();
+
+  if (!properties) {
+    return (
+      <div>
+        <h1>Properties</h1>
+        <p>Something went wrong loading properties. Please try again later.</p>
+      </div>
+    );
+  }
+
+  if (properties.length === 0) {
+    return (
+      <div>
+        <h1>Properties</h1>
+        <p>No properties available right now.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
