@@ -1,19 +1,20 @@
 import express from 'express'
 import prisma from '../db/prisma.js'
 import { validateAgentMiddleware, validateUpdateAgentMiddleware } from '../utils/validate.js'
+import { requireAdmin, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
 const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, role:true, properties: true}
 
 // get all agents
-router.get("/", async(req, res) => {
+router.get("/", requireAuth, requireAdmin, async(req, res) => {
     const agents = await prisma.agent.findMany({select: agentSelect})
     res.json(agents);
 })
 
 // get single agent
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
     const { id } = req.params
     const agent = await prisma.agent.findUnique({ where: { id }, select: agentSelect })
     if (!agent) throw new AppError('Agent not found', 404)
@@ -21,7 +22,7 @@ router.get('/:id', async (req, res) => {
 })
   
 // create agent
-router.post('/', validateAgentMiddleware, async (req, res) => {
+router.post('/', requireAuth, requireAdmin, validateAgentMiddleware, async (req, res) => {
     // const { name, email, password, phone, whatsapp, role, properties } = req.body
    
     const newAgent = await prisma.agent.create({ data: req.body, select: agentSelect });
@@ -29,7 +30,7 @@ router.post('/', validateAgentMiddleware, async (req, res) => {
   })
   
 // update agent
-router.put('/:id', validateUpdateAgentMiddleware, async (req, res) => {
+router.put('/:id',requireAuth, validateUpdateAgentMiddleware, async (req, res) => {
     const { id } = req.params
     const agent = await prisma.agent.findUnique({ where: { id } })
     if (!agent) throw new AppError('Agent not found', 404)
@@ -42,7 +43,7 @@ router.put('/:id', validateUpdateAgentMiddleware, async (req, res) => {
 })
   
 // delete agent
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
     const { id } = req.params
     const agent = await prisma.agent.findUnique({ where: { id } })
     if (!agent) throw new AppError('Agent not found', 404)

@@ -1,6 +1,7 @@
 import express from 'express';      
 import prisma from '../db/prisma.js';
 import { validateInquiryMiddleware, validateUpdateInquiryMiddleware } from '../utils/validate.js';
+import { requireAdmin, requireAuth, requireAgent, requireClient } from '../middleware/auth.js';
 
 const router = express.Router();   
 
@@ -14,13 +15,13 @@ const inquirySelect = {
 }
 
 // get all inquiries
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, requireAgent, async (req, res) => {
     const inquiries = await prisma.inquiry.findMany({select: inquirySelect})
     res.json(inquiries);
 })
 
 // get single inquiry
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
     const { id } = req.params
     const inquiry = await prisma.inquiry.findUnique({ where: { id }, select: inquirySelect })
     if(!inquiry) return res.status(404).json({error: 'Inquiry not found'})
@@ -28,7 +29,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // create inquiry
-router.post('/', validateInquiryMiddleware, async (req, res) => {
+router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (req, res) => {
     const clientId = req.user.userId  
     const { propertyId, message } = req.body
     const inquiry = await prisma.inquiry.create({
@@ -38,7 +39,7 @@ router.post('/', validateInquiryMiddleware, async (req, res) => {
   })
 
 // update inquiry
-router.put('/:id', validateUpdateInquiryMiddleware, async (req, res) => {
+router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, async (req, res) => {
     const { id } = req.params
     const inquiry = await prisma.inquiry.findUnique({ where: { id } })
     if (!inquiry) throw new AppError('Inquiry not found', 404)
@@ -50,7 +51,7 @@ router.put('/:id', validateUpdateInquiryMiddleware, async (req, res) => {
 })
 
 // delete inquiry
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
     const { id } = req.params
     const inquiry = await prisma.inquiry.findUnique({ where: { id } })
     if (!inquiry) throw new AppError('Inquiry not found', 404)
