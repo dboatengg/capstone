@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import Link from 'next/link';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [userType, setUserType] = useState<'agent' | 'client'>('agent');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,18 +22,20 @@ export default function LoginPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/auth/${userType}/login`,
+        `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/auth/${userType}/register`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ name, email, password }),
         }
       );
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Login failed. Please try again.');
+        // Zod validation errors come back as an `errors` array; auth errors come as a single `error` string
+        const message = data.errors?.[0]?.message || data.error || 'Registration failed. Please try again.';
+        setError(message);
         setIsSubmitting(false);
         return;
       }
@@ -42,7 +44,7 @@ export default function LoginPage() {
       login({ ...user, userType }, data.token);
       router.push('/properties');
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Registration error:', err);
       setError('Something went wrong. Please try again.');
       setIsSubmitting(false);
     }
@@ -50,9 +52,8 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl text-[var(--color-ink)] mb-8">Log in</h1>
+      <h1 className="font-display text-3xl text-[var(--color-ink)] mb-8">Create an account</h1>
 
-      {/* Agent/Client toggle */}
       <div className="flex border border-[var(--color-stone-line)] mb-6">
         <button
           type="button"
@@ -80,6 +81,20 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          <label htmlFor="name" className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
+            Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border border-[var(--color-stone-line)] px-3 py-2 focus:outline-none focus:border-[var(--color-forest)]"
+          />
+        </div>
+
+        <div>
           <label htmlFor="email" className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
             Email
           </label>
@@ -101,10 +116,12 @@ export default function LoginPage() {
             id="password"
             type="password"
             required
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border border-[var(--color-stone-line)] px-3 py-2 focus:outline-none focus:border-[var(--color-forest)]"
           />
+          <p className="text-xs text-[var(--color-ink)]/50 mt-1">At least 8 characters</p>
         </div>
 
         {error && <p className="text-sm text-[var(--color-clay)]">{error}</p>}
@@ -114,14 +131,9 @@ export default function LoginPage() {
           disabled={isSubmitting}
           className="w-full bg-[var(--color-forest)] text-white text-sm font-medium py-3 hover:bg-[var(--color-ink)] transition-colors disabled:opacity-50"
         >
-          {isSubmitting ? 'Logging in...' : `Log in as ${userType}`}
+          {isSubmitting ? 'Creating account...' : `Sign up as ${userType}`}
         </button>
       </form>
-      <p className="text-sm text-[var(--color-ink)]/60 text-center mt-6"> Don&apos;t have an account?{' '}
-      <Link href="/register" className="text-[var(--color-forest)] font-medium hover:underline">
-      Sign up
-      </Link>
-      </p>
     </div>
   );
 }
