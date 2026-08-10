@@ -31,3 +31,43 @@ export async function getProperty(id: string): Promise<Property | null> {
     return null;
   }
 }
+
+type CreatePropertyInput = {
+  title: string;
+  shortDescription: string;
+  longDescription: string;
+  price: number;
+  type: string;
+  bedrooms: number;
+  bathrooms: number;
+  location: string;
+  available: boolean;
+};
+
+export async function createProperty(
+  input: CreatePropertyInput,
+  token: string
+): Promise<{ success: true; property: Property } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(input),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to create property';
+      return { success: false, error: message };
+    }
+
+    return { success: true, property: data };
+  } catch (err) {
+    console.error('Network error creating property:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}

@@ -28,19 +28,27 @@ export default function Nav() {
             Properties
           </Link>
 
-          {user ? (
+                    {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm text-[var(--color-ink)]/70">
+                {user.userType === 'agent' && (
+                <Link
+                    href="/properties/new"
+                    className="text-sm font-medium text-[var(--color-brass)] hover:text-[var(--color-ink)] transition-colors"
+                >
+                    + New listing
+                </Link>
+                )}
+                <span className="text-sm text-[var(--color-ink)]/70">
                 {user.name} <span className="text-[var(--color-ink)]/40">({user.userType})</span>
-              </span>
-              <button
+                </span>
+                <button
                 onClick={handleLogout}
                 className="text-sm font-medium text-[var(--color-clay)] hover:text-[var(--color-ink)] transition-colors"
-              >
+                >
                 Logout
-              </button>
+                </button>
             </div>
-          ) : (
+            ) : (
             <Link
               href="/login"
               className="text-sm font-medium text-[var(--color-forest)] hover:text-[var(--color-ink)] transition-colors"
