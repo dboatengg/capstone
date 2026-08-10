@@ -15,7 +15,6 @@ type StoredAuth = {
   token: string | null;
 };
 
-// A small pub/sub system so React knows when localStorage changes
 const listeners = new Set<() => void>();
 
 function notifyListeners() {
@@ -27,16 +26,32 @@ function subscribe(callback: () => void) {
   return () => listeners.delete(callback);
 }
 
-// Reads the CURRENT value from localStorage 
-function getSnapshot(): StoredAuth {
-  const token = localStorage.getItem('token');
-  const user = localStorage.getItem('user');
-  return { token, user: user ? JSON.parse(user) : null };
+// A fixed, unchanging object — the server always renders "logged out"
+const SERVER_SNAPSHOT: StoredAuth = { user: null, token: null };
+
+function getServerSnapshot(): StoredAuth {
+  return SERVER_SNAPSHOT;
 }
 
-// The server has no localStorage — always render "logged out" on the server
-function getServerSnapshot(): StoredAuth {
-  return { token: null, user: null };
+// Cache the last computed snapshot so we only build a NEW object
+// when the underlying localStorage values actually changed.
+let cachedToken: string | null = null;
+let cachedUserRaw: string | null = null;
+let cachedSnapshot: StoredAuth = SERVER_SNAPSHOT;
+
+function getSnapshot(): StoredAuth {
+  const token = localStorage.getItem('token');
+  const userRaw = localStorage.getItem('user');
+
+  // Nothing changed since last read — return the SAME object reference
+  if (token === cachedToken && userRaw === cachedUserRaw) {
+    return cachedSnapshot;
+  }
+
+  cachedToken = token;
+  cachedUserRaw = userRaw;
+  cachedSnapshot = { token, user: userRaw ? JSON.parse(userRaw) : null };
+  return cachedSnapshot;
 }
 
 function setStoredAuth(user: AuthUser, token: string) {

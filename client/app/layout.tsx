@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Fraunces, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/context/AuthContext';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${fraunces.variable} ${plexSans.variable} font-sans`}>
+        <AuthProvider>
         <header className="border-b border-[var(--color-stone-line)] bg-white">
           <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <Link href="/" className="font-display text-xl text-[var(--color-ink)]">
@@ -33,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </nav>
         </header>
         {children}
+        </AuthProvider>
       </body>
     </html>
   );
