@@ -26,6 +26,13 @@ export default function Home() {
             >
               Browse properties →
             </Link>
+
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 border border-[var(--color-ink)]/20 text-[var(--color-ink)] text-sm font-medium px-6 py-3 hover:border-[var(--color-forest)] hover:text-[var(--color-forest)] transition-colors"
+            >
+              Log in
+            </Link>
           </div>
         </div>
 
