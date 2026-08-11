@@ -21,3 +21,20 @@ export type Property = {
   updatedAt: string;
   agent: Agent;
 };
+
+export type Inquiry = {
+  id: string;
+  message: string;
+  status: string;
+  createdAt: string;
+  property: {
+    id: string;
+    title: string;
+    location: string;
+  };
+  client: {
+    id: string;
+    name: string;
+    email: string;
+  };
+};

@@ -1,5 +1,6 @@
 import { getProperty } from '@/lib/api';
 import Link from 'next/link';
+import InquiryForm from '@/components/InquiryForm';
 
 export default async function PropertyDetailPage({
   params,
@@ -88,6 +89,9 @@ export default async function PropertyDetailPage({
           {property.agent.phone && <span>{property.agent.phone}</span>}
           {property.agent.whatsapp && <span>WhatsApp: {property.agent.whatsapp}</span>}
         </div>
+      </div>
+      <div className="mt-8 border border-[var(--color-stone-line)] bg-white p-6">
+        <InquiryForm propertyId={property.id} />
       </div>
     </div>
   );

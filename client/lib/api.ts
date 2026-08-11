@@ -1,4 +1,4 @@
-import { Property } from './types';
+import { Property, Inquiry } from './types';
 
 export async function getProperties(): Promise<Property[] | null> {
   try {
@@ -69,5 +69,52 @@ export async function createProperty(
   } catch (err) {
     console.error('Network error creating property:', err);
     return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+export async function createInquiry(
+  propertyId: string,
+  message: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ propertyId, message }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to send inquiry';
+      return { success: false, error: message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error creating inquiry:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+export async function getInquiries(token: string): Promise<Inquiry[] | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch inquiries:', res.status);
+      return null;
+    }
+
+    return res.json();
+  } catch (err) {
+    console.error('Network error fetching inquiries:', err);
+    return null;
   }
 }

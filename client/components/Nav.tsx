@@ -31,12 +31,20 @@ export default function Nav() {
                     {user ? (
             <div className="flex items-center gap-4">
                 {user.userType === 'agent' && (
-                <Link
-                    href="/properties/new"
-                    className="text-sm font-medium text-[var(--color-brass)] hover:text-[var(--color-ink)] transition-colors"
-                >
-                    + New listing
-                </Link>
+                  <>
+                    <Link
+                      href="/properties/new"
+                      className="text-sm font-medium text-[var(--color-brass)] hover:text-[var(--color-ink)] transition-colors"
+                    >
+                      + New listing
+                    </Link>
+                    <Link
+                      href="/inquiries"
+                      className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
+                    >
+                      Inquiries
+                    </Link>
+                  </>
                 )}
                 <span className="text-sm text-[var(--color-ink)]/70">
                 {user.name} <span className="text-[var(--color-ink)]/40">({user.userType})</span>
