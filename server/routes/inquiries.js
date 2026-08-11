@@ -29,15 +29,30 @@ router.get('/:id', requireAuth, async (req, res) => {
     res.json(inquiry);
 })
 
+// // create inquiry
+// router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (req, res) => {
+//     const clientId = req.user.userId  
+//     const { propertyId, message } = req.body
+//     const inquiry = await prisma.inquiry.create({
+//       data: { clientId, propertyId, message }
+//     })
+//     res.status(201).json(inquiry)
+//   })
+
 // create inquiry
 router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (req, res) => {
-    const clientId = req.user.userId  
-    const { propertyId, message } = req.body
-    const inquiry = await prisma.inquiry.create({
-      data: { clientId, propertyId, message }
-    })
-    res.status(201).json(inquiry)
+  const clientId = req.user.userId
+  const { propertyId, message } = req.body
+
+  const property = await prisma.property.findUnique({ where: { id: propertyId } })
+  if (!property) throw new AppError('Property not found', 404)
+  if (!property.available) throw new AppError('This property is no longer available', 400)
+
+  const inquiry = await prisma.inquiry.create({
+    data: { clientId, propertyId, message }
   })
+  res.status(201).json(inquiry)
+})
 
 // update inquiry
 router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, async (req, res) => {
