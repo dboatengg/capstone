@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getInquiries } from '@/lib/api';
 import { Inquiry } from '@/lib/types';
 import RequireAuth from '@/components/RequireAuth';
+import InquiryCard from '@/components/InquiryCard';
 
 function InquiriesList() {
   const { token } = useAuth();
@@ -27,23 +28,7 @@ function InquiriesList() {
   return (
     <div className="space-y-4">
       {inquiries.map((inquiry) => (
-        <div key={inquiry.id} className="border border-[var(--color-stone-line)] bg-white p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-medium text-[var(--color-ink)]">{inquiry.property.title}</p>
-              <p className="text-sm text-[var(--color-ink)]/50">{inquiry.property.location}</p>
-            </div>
-            <span className="text-xs uppercase tracking-wide text-[var(--color-brass)] font-medium">
-              {inquiry.status}
-            </span>
-          </div>
-
-          <p className="text-sm text-[var(--color-ink)]/80 mt-3">{inquiry.message}</p>
-
-          <p className="text-xs text-[var(--color-ink)]/50 mt-3">
-            From {inquiry.client.name} ({inquiry.client.email})
-          </p>
-        </div>
+        <InquiryCard key={inquiry.id} inquiry={inquiry} />
       ))}
     </div>
   );

@@ -118,3 +118,33 @@ export async function getInquiries(token: string): Promise<Inquiry[] | null> {
     return null;
   }
 }
+
+// 
+export async function updateInquiryStatus(
+  id: string,
+  status: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to update status';
+      return { success: false, error: message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error updating inquiry status:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}

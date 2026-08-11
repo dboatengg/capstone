@@ -16,9 +16,14 @@ export default function RequireAuth({ children, allowedTypes }: Props) {
   const isAllowed = user && (!allowedTypes || allowedTypes.includes(user.userType));
 
   useEffect(() => {
-    if (!user) {
+    // On a hard refresh, `user` can briefly be null for one tick while the
+    // client finishes reading localStorage. Check localStorage directly
+    // here too, so we don't redirect based on that stale first read.
+    const hasToken = typeof window !== 'undefined' && localStorage.getItem('token');
+
+    if (!user && !hasToken) {
       router.push('/login');
-    } else if (allowedTypes && !allowedTypes.includes(user.userType)) {
+    } else if (user && allowedTypes && !allowedTypes.includes(user.userType)) {
       router.push('/');
     }
   }, [user, allowedTypes, router]);
@@ -26,7 +31,7 @@ export default function RequireAuth({ children, allowedTypes }: Props) {
   if (!isAllowed) {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
-        <p className="text-[var(--color-ink)]/60">Redirecting...</p>
+        <p className="text-[var(--color-ink)]/60">Loading...</p>
       </div>
     );
   }
