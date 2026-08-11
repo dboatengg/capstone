@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getInquiries } from '@/lib/api';
 import { Inquiry } from '@/lib/types';
-import RequireAuth from '@/components/RequireAuth';
 import InquiryCard from '@/components/InquiryCard';
 
 function InquiriesList() {
@@ -36,9 +35,9 @@ function InquiriesList() {
 
 export default function InquiriesPage() {
   return (
-    <RequireAuth allowedTypes={['agent']}>
+    <>
       <h1 className="font-display text-3xl text-[var(--color-ink)] mb-8">Inquiries</h1>
       <InquiriesList />
-    </RequireAuth>
+    </>
   );
 }
