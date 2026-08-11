@@ -21,19 +21,6 @@ router.get('/', requireAuth, requireAgent, async (req, res) => {
   res.json(inquiries);
 })
 
-// check if the current client has already inquired about a property
-// MUST come before /:id, or Express matches "check" as if it were an :id
-router.get('/check/:propertyId', requireAuth, requireClient, async (req, res) => {
-  const { propertyId } = req.params
-  const clientId = req.user.userId
-
-  const existing = await prisma.inquiry.findUnique({
-    where: { clientId_propertyId: { clientId, propertyId } }
-  })
-
-  res.json({ alreadyInquired: !!existing })
-})
-
 // get single inquiry
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params
