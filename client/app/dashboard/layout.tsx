@@ -7,7 +7,7 @@ import RequireAuth from '@/components/RequireAuth';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/dashboard/listings', label: 'Listings' },
-  { href: '/inquiries', label: 'Inquiries' },
+  { href: '/dashboard/inquiries', label: 'Inquiries' },
   { href: '/dashboard/profile', label: 'Profile' },
 ];
 
