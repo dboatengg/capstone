@@ -2,7 +2,7 @@ import { Property, Inquiry } from './types';
 
 export async function getProperties(): Promise<Property[] | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/properties`);
 
     if (!res.ok) {
       console.error('Failed to fetch properties:', res.status);
@@ -18,7 +18,7 @@ export async function getProperties(): Promise<Property[] | null> {
 
 export async function getProperty(id: string): Promise<Property | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/properties/${id}`);
 
     if (!res.ok) {
       console.error('Failed to fetch property:', res.status);
@@ -49,7 +49,7 @@ export async function createProperty(
   token: string
 ): Promise<{ success: true; property: Property } | { success: false; error: string }> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/properties`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ export async function createInquiry(
   token: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export async function createInquiry(
 
 export async function getInquiries(token: string): Promise<Inquiry[] | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -126,7 +126,7 @@ export async function updateInquiryStatus(
   token: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
