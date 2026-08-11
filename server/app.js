@@ -16,7 +16,10 @@ const app = express();
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors ({
-    origin: 'http://localhost:4000', 
+    origin: [
+      'http://localhost:4000',
+      'https://capstone-frontend.vercel.app' // production frontend
+    ], 
     credentials: true
 }))
 
