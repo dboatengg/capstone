@@ -13,50 +13,37 @@ export default function Nav() {
     router.push('/');
   }
 
+  const isAgent = user?.userType === 'agent';
+
   return (
     <header className="border-b border-[var(--color-stone-line)] bg-white">
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <Link href={user?.userType === 'agent' ? '/dashboard' : '/'} className="font-display text-xl text-[var(--color-ink)]">
-      Capstone
-      </Link>
+        <Link
+          href={isAgent ? '/dashboard' : '/'}
+          className="font-display text-xl text-[var(--color-ink)]"
+        >
+          Capstone
+        </Link>
 
         <div className="flex items-center gap-6">
-          <Link
-            href="/properties"
-            className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
-          >
-            Properties
-          </Link>
+          {/* Clients (and logged-out visitors) still browse from the top nav */}
+          {!isAgent && (
+            <Link
+              href="/properties"
+              className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
+            >
+              Properties
+            </Link>
+          )}
 
-                    {user ? (
-            <div className="flex items-center gap-4">
-                {user.userType === 'agent' && (
-                  <>
-                    <Link
-                      href="/properties/new"
-                      className="text-sm font-medium text-[var(--color-brass)] hover:text-[var(--color-ink)] transition-colors"
-                    >
-                      + New listing
-                    </Link>
-                    <Link
-                      href="/inquiries"
-                      className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
-                    >
-                      Inquiries
-                    </Link>
-                  </>
-                )}
-                <span className="text-sm text-[var(--color-ink)]/70">
-                {user.name} <span className="text-[var(--color-ink)]/40">({user.userType})</span>
-                </span>
-                <button
-                onClick={handleLogout}
-                className="text-sm font-medium text-[var(--color-clay)] hover:text-[var(--color-ink)] transition-colors"
-                >
-                Logout
-                </button>
-            </div>
-            ) : (
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="text-sm font-medium text-[var(--color-clay)] hover:text-[var(--color-ink)] transition-colors"
+            >
+              Logout
+            </button>
+          ) : (
             <Link
               href="/login"
               className="text-sm font-medium text-[var(--color-forest)] hover:text-[var(--color-ink)] transition-colors"
