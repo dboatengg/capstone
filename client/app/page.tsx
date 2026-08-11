@@ -1,6 +1,24 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.userType === 'agent') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  if (user?.userType === 'agent') {
+    return null;
+  }
+
   return (
     <div className="bg-[var(--color-paper)]">
       <main className="max-w-6xl mx-auto px-6 py-24 sm:py-32">
@@ -36,7 +54,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Signature strip — echoes the price badge motif from the cards, used here as pure texture */}
         <div className="flex gap-1.5 mt-24">
           <div className="h-1.5 w-16 bg-[var(--color-forest)]" />
           <div className="h-1.5 w-16 bg-[var(--color-brass)]" />

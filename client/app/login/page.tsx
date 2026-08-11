@@ -40,7 +40,8 @@ export default function LoginPage() {
 
       const user = userType === 'agent' ? data.agent : data.client;
       login({ ...user, userType }, data.token);
-      router.push('/properties');
+      router.push(userType === 'agent' ? '/dashboard' : '/properties');
+
     } catch (err) {
       console.error('Login error:', err);
       setError('Something went wrong. Please try again.');

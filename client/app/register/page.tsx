@@ -42,7 +42,8 @@ export default function RegisterPage() {
 
       const user = userType === 'agent' ? data.agent : data.client;
       login({ ...user, userType }, data.token);
-      router.push('/properties');
+      router.push(userType === 'agent' ? '/dashboard' : '/properties');
+
     } catch (err) {
       console.error('Registration error:', err);
       setError('Something went wrong. Please try again.');
