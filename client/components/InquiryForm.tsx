@@ -4,12 +4,26 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { createInquiry } from '@/lib/api';
 
-export default function InquiryForm({ propertyId }: { propertyId: string }) {
-  const { user, token } = useAuth();
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
+export default function InquiryForm({
+    propertyId,
+    available,
+  }: {
+    propertyId: string;
+    available: boolean;
+  }) {
+    const { user, token } = useAuth();
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sent, setSent] = useState(false);
+  
+    if (!available) {
+      return (
+        <p className="text-sm text-[var(--color-ink)]/60">
+          This property is no longer available for inquiries.
+        </p>
+      );
+    }
 
   // Not logged in at all
   if (!user) {

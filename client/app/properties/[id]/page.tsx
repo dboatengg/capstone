@@ -91,7 +91,8 @@ export default async function PropertyDetailPage({
         </div>
       </div>
       <div className="mt-8 border border-[var(--color-stone-line)] bg-white p-6">
-        <InquiryForm propertyId={property.id} />
+        {/* <InquiryForm propertyId={property.id} /> */}
+        <InquiryForm propertyId={property.id} available={property.available} />
       </div>
     </div>
   );
