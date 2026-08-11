@@ -1,12 +1,16 @@
+
 import prisma from '../db/prisma.js';
 import bcrypt from 'bcrypt';
-
 
 async function main() {
   const hashedPassword = await bcrypt.hash('password123', 10);
 
-  const agent = await prisma.agent.create({
-    data: {
+  const agent = await prisma.agent.upsert({
+    where: {
+      email: 'ama@capstone.com',
+    },
+    update: {},
+    create: {
       name: 'Ama Boateng',
       email: 'ama@capstone.com',
       password: hashedPassword,
@@ -20,7 +24,8 @@ async function main() {
       {
         title: 'Modern Apartment in East Legon',
         shortDescription: 'A beautiful 3 bedroom apartment in East Legon',
-        longDescription: 'This stunning modern apartment is located in the heart of East Legon, Accra. It features 3 spacious bedrooms, 2 bathrooms, and a large living area with breathtaking city views.',
+        longDescription:
+          'This stunning modern apartment is located in the heart of East Legon, Accra. It features 3 spacious bedrooms, 2 bathrooms, and a large living area with breathtaking city views.',
         price: 230000,
         type: 'sale',
         available: true,
@@ -31,8 +36,10 @@ async function main() {
       },
       {
         title: 'Cozy 2-Bed in Kumasi Ridge',
-        shortDescription: 'Quiet, leafy neighborhood close to the city center',
-        longDescription: 'A comfortable 2 bedroom home tucked away in the Ridge area of Kumasi, known for its tree-lined streets and proximity to major amenities.',
+        shortDescription:
+          'Quiet, leafy neighborhood close to the city center',
+        longDescription:
+          'A comfortable 2 bedroom home tucked away in the Ridge area of Kumasi, known for its tree-lined streets and proximity to major amenities.',
         price: 1800,
         type: 'rent',
         available: true,
@@ -44,7 +51,8 @@ async function main() {
       {
         title: 'Luxury Villa in Trasacco Valley',
         shortDescription: '5 bedroom villa with pool and garden',
-        longDescription: 'An expansive luxury villa in the gated Trasacco Valley community, featuring a private pool, landscaped garden, and 24-hour security.',
+        longDescription:
+          'An expansive luxury villa in the gated Trasacco Valley community, featuring a private pool, landscaped garden, and 24-hour security.',
         price: 850000,
         type: 'sale',
         available: false,
@@ -55,8 +63,10 @@ async function main() {
       },
       {
         title: 'Studio Apartment in Adum',
-        shortDescription: 'Compact and affordable, walking distance to Kejetia',
-        longDescription: 'A well-maintained studio apartment in the busy Adum area, perfect for young professionals working in central Kumasi.',
+        shortDescription:
+          'Compact and affordable, walking distance to Kejetia',
+        longDescription:
+          'A well-maintained studio apartment in the busy Adum area, perfect for young professionals working in central Kumasi.',
         price: 900,
         type: 'rent',
         available: true,
