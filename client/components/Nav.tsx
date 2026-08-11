@@ -18,12 +18,9 @@ export default function Nav() {
   return (
     <header className="border-b border-[var(--color-stone-line)] bg-white">
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link
-          href={isAgent ? '/dashboard' : '/'}
-          className="font-display text-xl text-[var(--color-ink)]"
-        >
-          Capstone
-        </Link>
+      <Link href={isAgent ? '/dashboard' : user?.userType === 'client' ? '/home' : '/'} className="font-display text-xl text-[var(--color-ink)]">
+      Capstone
+      </Link>
 
         <div className="flex items-center gap-6">
           {/* Clients (and logged-out visitors) still browse from the top nav */}
