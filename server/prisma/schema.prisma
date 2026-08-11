@@ -64,4 +64,6 @@ model Inquiry {
   property   Property @relation(fields: [propertyId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@unique([clientId, propertyId])
 }
