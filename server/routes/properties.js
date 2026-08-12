@@ -25,10 +25,70 @@ const propertySelect = {
   }
 
 // get all properties
+// router.get('/', async (req, res) => {
+//     const properties = await prisma.property.findMany({select: propertySelect})
+//     res.json(properties);
+// })
+
 router.get('/', async (req, res) => {
-    const properties = await prisma.property.findMany({select: propertySelect})
-    res.json(properties);
-})
+  const {
+    search,
+    minPrice,
+    maxPrice,
+    bedrooms,
+    bathrooms,
+  } = req.query;
+
+  const where = {};
+
+  // Text search: title and location
+  if (search) {
+    where.OR = [
+      {
+        title: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      {
+        location: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+    ];
+  }
+
+  // Price range
+  if (minPrice || maxPrice) {
+    where.price = {};
+
+    if (minPrice) {
+      where.price.gte = Number(minPrice);
+    }
+
+    if (maxPrice) {
+      where.price.lte = Number(maxPrice);
+    }
+  }
+
+  // Bedrooms
+  if (bedrooms) {
+    where.bedrooms = Number(bedrooms);
+  }
+
+  // Bathrooms
+  if (bathrooms) {
+    where.bathrooms = Number(bathrooms);
+  }
+
+  const properties = await prisma.property.findMany({
+    where,
+    select: propertySelect,
+  });
+
+  res.json(properties);
+});
 
 // get single property
 router.get('/:id', async (req, res) => {
