@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { getProperties, deleteProperty } from '@/lib/api';
 import { Property } from '@/lib/types';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function ListingsPage() {
   const { user, token } = useAuth();
   const [listings, setListings] = useState<Property[] | null>(null);
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Property | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -22,22 +23,24 @@ export default function ListingsPage() {
     });
   }, [user]);
 
-  async function handleDelete(id: string) {
-    setError('');
-    setDeletingId(id);
+  async function handleConfirmDelete() {
+    if (!pendingDelete) return;
 
-    const result = await deleteProperty(id, token!);
+    setError('');
+    setIsDeleting(true);
+
+    const result = await deleteProperty(pendingDelete.id, token!);
 
     if (!result.success) {
       setError(result.error);
-      setDeletingId(null);
-      setConfirmingId(null);
+      setIsDeleting(false);
+      setPendingDelete(null);
       return;
     }
 
-    setListings((prev) => prev?.filter((p) => p.id !== id) ?? null);
-    setDeletingId(null);
-    setConfirmingId(null);
+    setListings((prev) => prev?.filter((p) => p.id !== pendingDelete.id) ?? null);
+    setIsDeleting(false);
+    setPendingDelete(null);
   }
 
   return (
@@ -97,45 +100,26 @@ export default function ListingsPage() {
                     {new Date(property.updatedAt).toLocaleDateString()}
                   </td>
                   <td className="py-3">
-                    {confirmingId === property.id ? (
-                      <div className="flex items-center gap-3">
-                        <span className="text-[var(--color-ink)]/70">Delete?</span>
-                        <button
-                          onClick={() => handleDelete(property.id)}
-                          disabled={deletingId === property.id}
-                          className="text-[var(--color-clay)] font-medium hover:underline disabled:opacity-50"
-                        >
-                          {deletingId === property.id ? 'Deleting...' : 'Yes'}
-                        </button>
-                        <button
-                          onClick={() => setConfirmingId(null)}
-                          className="text-[var(--color-ink)]/50 hover:underline"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-4">
-                        <Link
-                          href={`/properties/${property.id}`}
-                          className="text-[var(--color-forest)] hover:underline"
-                        >
-                          View
-                        </Link>
-                        <Link
-                          href={`/properties/${property.id}/edit`}
-                          className="text-[var(--color-brass)] hover:underline"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => setConfirmingId(property.id)}
-                          className="text-[var(--color-clay)] hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={`/properties/${property.id}`}
+                        className="text-[var(--color-forest)] hover:underline"
+                      >
+                        View
+                      </Link>
+                      <Link
+                        href={`/properties/${property.id}/edit`}
+                        className="text-[var(--color-brass)] hover:underline"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => setPendingDelete(property)}
+                        className="text-[var(--color-clay)] hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -143,6 +127,20 @@ export default function ListingsPage() {
           </table>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        title="Delete listing"
+        message={
+          pendingDelete
+            ? `Are you sure you want to delete "${pendingDelete.title}"? This can't be undone.`
+            : ''
+        }
+        confirmLabel="Delete"
+        isConfirming={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
