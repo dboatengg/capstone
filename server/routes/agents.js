@@ -10,46 +10,60 @@ const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, 
 
 // get all agents
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
-    const agents = await prisma.agent.findMany({select: agentSelect})
-    res.json(agents);
+  const agents = await prisma.agent.findMany({select: agentSelect})
+  res.json(agents);
 })
 
-// get single agent
+// get single agent — public-ish; contact info is meant to be visible (matches property listings)
 router.get('/:id', requireAuth, async (req, res) => {
-    const { id } = req.params
-    const agent = await prisma.agent.findUnique({ where: { id }, select: agentSelect })
-    if (!agent) throw new AppError('Agent not found', 404)
-    res.json(agent)
+  const { id } = req.params
+  const agent = await prisma.agent.findUnique({ where: { id }, select: agentSelect })
+  if (!agent) throw new AppError('Agent not found', 404)
+  res.json(agent)
 })
-  
+
 // create agent
 router.post('/', requireAuth, requireAdmin, validateAgentMiddleware, async (req, res) => {
-    // const { name, email, password, phone, whatsapp, role, properties } = req.body
-   
-    const newAgent = await prisma.agent.create({ data: req.body, select: agentSelect });
-    res.status(201).json(newAgent);
-  })
-  
-// update agent
-router.put('/:id',requireAuth, validateUpdateAgentMiddleware, async (req, res) => {
-    const { id } = req.params
-    const agent = await prisma.agent.findUnique({ where: { id } })
-    if (!agent) throw new AppError('Agent not found', 404)
-    const updatedAgent = await prisma.agent.update({
-        where: { id },
-        data: req.body,
-        select: agentSelect
-    })
-    res.json(updatedAgent)
+  const newAgent = await prisma.agent.create({ data: req.body, select: agentSelect });
+  res.status(201).json(newAgent);
 })
-  
+
+// update agent — only the agent themselves, or an admin, can update this
+router.put('/:id', requireAuth, validateUpdateAgentMiddleware, async (req, res) => {
+  const { id } = req.params
+
+  const isOwner = req.user.userId === id
+  const isAdmin = req.user.role === 'admin'
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this agent', 403)
+  }
+
+  const agent = await prisma.agent.findUnique({ where: { id } })
+  if (!agent) throw new AppError('Agent not found', 404)
+
+  // only an admin may change role — strip it out of the request body otherwise,
+  // so an agent can't self-promote by sneaking { role: "admin" } into a normal update
+  const data = { ...req.body }
+  if (!isAdmin) {
+    delete data.role
+  }
+
+  const updatedAgent = await prisma.agent.update({
+    where: { id },
+    data,
+    select: agentSelect
+  })
+  res.json(updatedAgent)
+})
+
 // delete agent
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
-    const { id } = req.params
-    const agent = await prisma.agent.findUnique({ where: { id } })
-    if (!agent) throw new AppError('Agent not found', 404)
-    await prisma.agent.delete({ where: { id } })
-    res.status(204).send()
+  const { id } = req.params
+  const agent = await prisma.agent.findUnique({ where: { id } })
+  if (!agent) throw new AppError('Agent not found', 404)
+  await prisma.agent.delete({ where: { id } })
+  res.status(204).send()
 })
-  
+
 export default router
