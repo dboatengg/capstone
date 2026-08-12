@@ -72,7 +72,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-xl text-[var(--color-ink)]">Recent Inquiries</h2>
           <Link
-            href="/inquiries"
+            href="/dashboard/inquiries"
             className="text-sm font-medium text-[var(--color-forest)] hover:underline"
           >
             View all →
