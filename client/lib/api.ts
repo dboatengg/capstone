@@ -12,7 +12,8 @@ export async function getProperties(): Promise<Property[] | null> {
     return res.json();
   } catch (error) {
     console.error('Network error fetching properties:', error);
-    return null;
+    // return null;
+    throw error;
   }
 }
 
