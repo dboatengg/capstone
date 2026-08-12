@@ -10,9 +10,12 @@ export default function PropertyFilters() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+
     const search = formData.get('search')?.toString().trim();
     const minPrice = formData.get('minPrice')?.toString();
     const maxPrice = formData.get('maxPrice')?.toString();
+    const bedrooms = formData.get('bedrooms')?.toString();
+    const bathrooms = formData.get('bathrooms')?.toString();
     
     const params = new URLSearchParams();
     
@@ -26,6 +29,14 @@ export default function PropertyFilters() {
     
     if (maxPrice) {
       params.set('maxPrice', maxPrice);
+    }
+
+    if (bedrooms) {
+        params.set('bedrooms', bedrooms);
+    }
+      
+    if (bathrooms) {
+        params.set('bathrooms', bathrooms);
     }
 
     const queryString = params.toString();
@@ -78,6 +89,26 @@ export default function PropertyFilters() {
             defaultValue={searchParams.get('maxPrice') || ''}
             className="w-full rounded-lg border border-[var(--color-ink)]/15 bg-white px-4 py-3 text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 focus:border-[var(--color-ink)]/40 focus:ring-2 focus:ring-[var(--color-ink)]/5"
         />
+        </div>
+
+        {/* Bedroom and bathroom filters  */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <input
+                type="number"
+                name="bedrooms"
+                min="0"
+                placeholder="Number of bedrooms"
+                defaultValue={searchParams.get('bedrooms') || ''}
+                className="w-full rounded-lg border border-[var(--color-ink)]/15 bg-white px-4 py-3 text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 focus:border-[var(--color-ink)]/40 focus:ring-2 focus:ring-[var(--color-ink)]/5"
+            />
+
+            <input
+                type="number"
+                name="bathrooms"
+                min="0"
+                placeholder="Number of bathrooms"
+                defaultValue={searchParams.get('bathrooms') || ''}
+                className="w-full rounded-lg border border-[var(--color-ink)]/15 bg-white px-4 py-3 text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 focus:border-[var(--color-ink)]/40 focus:ring-2 focus:ring-[var(--color-ink)]/5"/>
         </div>
     </form>
   );
