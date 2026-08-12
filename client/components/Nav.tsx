@@ -14,12 +14,13 @@ export default function Nav() {
   }
 
   const isAgent = user?.userType === 'agent';
+  const isClient = user?.userType === 'client';
 
   return (
     <header className="border-b border-[var(--color-stone-line)] bg-white">
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link
-          href={isAgent ? '/dashboard' : user?.userType === 'client' ? '/home' : '/'}
+          href={isAgent ? '/dashboard' : isClient ? '/home' : '/'}
           className="font-display text-xl text-[var(--color-ink)]"
         >
           Capstone
@@ -32,6 +33,15 @@ export default function Nav() {
               className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
             >
               Dashboard
+            </Link>
+          )}
+
+          {isClient && (
+            <Link
+              href="/home"
+              className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
+            >
+              Home
             </Link>
           )}
 
