@@ -10,45 +10,61 @@ const clientSelect = {id:true, name:true, email:true, phone:true,}
 
 // get all clients
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
-    const clients = await prisma.client.findMany({select: clientSelect})
-    res.json(clients);
+  const clients = await prisma.client.findMany({select: clientSelect})
+  res.json(clients);
 })
 
-// get single client
-router.get('/:id',requireAuth, async (req, res) => {
-    const { id } = req.params
-    const client = await prisma.client.findUnique({ where: { id }, select: clientSelect })
-    if (!client) throw new AppError('Client not found', 404)
-    res.json(client)
+// get single client — only the client themselves, or an admin, can view this
+router.get('/:id', requireAuth, async (req, res) => {
+  const { id } = req.params
+
+  const isOwner = req.user.userId === id
+  const isAdmin = req.user.role === 'admin'
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to view this client', 403)
+  }
+
+  const client = await prisma.client.findUnique({ where: { id }, select: clientSelect })
+  if (!client) throw new AppError('Client not found', 404)
+  res.json(client)
 })
-  
+
 // create client
-router.post('/',requireAuth, requireAdmin, validateClientMiddleware, async (req, res) => {
-   
-    const newClient = await prisma.client.create({ data: req.body, select: clientSelect });
-    res.status(201).json(newClient);
-  })
-  
-// update client
-router.put('/:id', requireAuth, validateUpdateClientMiddleware, async (req, res) => {
-    const { id } = req.params
-    const client = await prisma.client.findUnique({ where: { id } })
-    if (!client) throw new AppError('Client not found', 404)
-    const updatedClient = await prisma.client.update({
-        where: { id },
-        data: req.body,
-        select: clientSelect
-    })
-    res.json(updatedClient)
+router.post('/', requireAuth, requireAdmin, validateClientMiddleware, async (req, res) => {
+  const newClient = await prisma.client.create({ data: req.body, select: clientSelect });
+  res.status(201).json(newClient);
 })
-  
+
+// update client — only the client themselves, or an admin, can update this
+router.put('/:id', requireAuth, validateUpdateClientMiddleware, async (req, res) => {
+  const { id } = req.params
+
+  const isOwner = req.user.userId === id
+  const isAdmin = req.user.role === 'admin'
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this client', 403)
+  }
+
+  const client = await prisma.client.findUnique({ where: { id } })
+  if (!client) throw new AppError('Client not found', 404)
+
+  const updatedClient = await prisma.client.update({
+    where: { id },
+    data: req.body,
+    select: clientSelect
+  })
+  res.json(updatedClient)
+})
+
 // delete client
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
-    const { id } = req.params
-    const client = await prisma.client.findUnique({ where: { id } })
-    if (!client) throw new AppError('Client not found', 404)
-    await prisma.client.delete({ where: { id } })
-    res.status(204).send();
+  const { id } = req.params
+  const client = await prisma.client.findUnique({ where: { id } })
+  if (!client) throw new AppError('Client not found', 404)
+  await prisma.client.delete({ where: { id } })
+  res.status(204).send();
 })
-  
+
 export default router
