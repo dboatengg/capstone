@@ -147,3 +147,54 @@ export async function updateInquiryStatus(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+export async function deleteProperty(
+  id: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Failed to delete property' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error deleting property:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+export async function updateProperty(
+  id: string,
+  input: CreatePropertyInput,
+  token: string
+): Promise<{ success: true; property: Property } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(input),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to update property';
+      return { success: false, error: message };
+    }
+
+    return { success: true, property: data };
+  } catch (err) {
+    console.error('Network error updating property:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
