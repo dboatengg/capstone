@@ -15,9 +15,19 @@ const inquirySelect = {
   client: { select: { id: true, name: true, email: true } }
 }
 
-// get all inquiries
+// get all inquiries — scoped to the logged-in agent's own properties
 router.get('/', requireAuth, requireAgent, async (req, res) => {
-  const inquiries = await prisma.inquiry.findMany({select: inquirySelect})
+  const agentId = req.user.userId
+
+  const inquiries = await prisma.inquiry.findMany({
+    where: {
+      property: {
+        agentId: agentId
+      }
+    },
+    select: inquirySelect
+  })
+
   res.json(inquiries);
 })
 
