@@ -23,14 +23,14 @@ export default function DashboardPage() {
   }, [user, token, router]);
 
   useEffect(() => {
-    if (!user || !token) return;
-
+    if (!user || !token || user.role === 'admin') return;
+  
     getProperties().then((properties) => {
       if (properties) {
         setMyListings(properties.filter((p) => p.agent.id === user.id));
       }
     });
-
+  
     getInquiries(token).then(setInquiries);
   }, [user, token]);
 
