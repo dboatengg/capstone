@@ -1,4 +1,4 @@
-# Capstone — Real Estate Platform
+# Capstone - Real Estate Platform
 
 A full-stack real estate platform that connects clients with property agents. Clients can browse and search available properties, while agents can create and manage property listings and respond to inquiries.
 
