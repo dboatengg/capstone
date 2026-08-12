@@ -26,6 +26,15 @@ export default function Nav() {
         </Link>
 
         <div className="flex items-center gap-6">
+          {isAgent && (
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+
           <Link
             href="/properties"
             className="text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors"
