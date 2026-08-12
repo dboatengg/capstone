@@ -1,8 +1,33 @@
 import { getProperties } from '@/lib/api';
 import PropertyCard from '@/components/PropertyCard';
 
-export default async function PropertiesPage() {
-  const properties = await getProperties();
+type SearchParams = {
+  search?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  bedrooms?: string;
+  bathrooms?: string;
+};
+
+type PropertiesPageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function PropertiesPage({
+  searchParams,
+}: PropertiesPageProps) {
+  const params = await searchParams;
+
+  const filters = {
+    search: params.search || undefined,
+    minPrice: params.minPrice ? Number(params.minPrice) : undefined,
+    maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
+    bedrooms: params.bedrooms ? Number(params.bedrooms) : undefined,
+    bathrooms: params.bathrooms ? Number(params.bathrooms) : undefined,
+  };
+
+  const properties = await getProperties(filters);
+
 
   if (!properties) {
     return (
