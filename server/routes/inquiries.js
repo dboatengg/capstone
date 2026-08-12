@@ -64,11 +64,23 @@ router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (r
 // update inquiry
 router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, async (req, res) => {
   const { id } = req.params
-  const inquiry = await prisma.inquiry.findUnique({ where: { id } })
+  const agentId = req.user.userId
+
+  const inquiry = await prisma.inquiry.findUnique({
+    where: { id },
+    include: { property: true }
+  })
   if (!inquiry) throw new AppError('Inquiry not found', 404)
+
+  // only the agent who owns the property this inquiry is about can update it
+  if (inquiry.property.agentId !== agentId) {
+    throw new AppError('You are not authorized to update this inquiry', 403)
+  }
+
   const updated = await prisma.inquiry.update({
     where: { id },
-    data: req.body
+    data: req.body,
+    select: inquirySelect
   })
   res.json(updated)
 })
