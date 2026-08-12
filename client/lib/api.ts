@@ -2,7 +2,9 @@ import { Property, Inquiry } from './types';
 
 export async function getProperties(): Promise<Property[] | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
+      cache: 'no-store',
+    });
 
     if (!res.ok) {
       console.error('Failed to fetch properties:', res.status);
@@ -18,7 +20,9 @@ export async function getProperties(): Promise<Property[] | null> {
 
 export async function getProperty(id: string): Promise<Property | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
+      cache: 'no-store',
+    });
 
     if (!res.ok) {
       console.error('Failed to fetch property:', res.status);
