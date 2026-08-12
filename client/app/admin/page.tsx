@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 type DashboardStats = {
   properties: number;
@@ -11,10 +12,23 @@ type DashboardStats = {
 };
 
 export default function AdminPage() {
-  const { token } = useAuth();
+    const { user, token } = useAuth();
+    const router = useRouter();
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
+  
+    if (user?.role !== 'admin') {
+      router.replace('/dashboard');
+    }
+  }, [token, user, router]);
+
 
   useEffect(() => {
     async function fetchDashboardStats() {

@@ -6,11 +6,21 @@ import { useAuth } from '@/context/AuthContext';
 import { getProperties, getInquiries } from '@/lib/api';
 import { Property, Inquiry } from '@/lib/types';
 import InquiryCard from '@/components/InquiryCard';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const { user, token } = useAuth();
+  const router = useRouter();
   const [myListings, setMyListings] = useState<Property[] | null>(null);
   const [inquiries, setInquiries] = useState<Inquiry[] | null>(null);
+
+  useEffect(() => {
+    if (!user || !token) return;
+  
+    if (user.role === 'admin') {
+      router.replace('/admin');
+    }
+  }, [user, token, router]);
 
   useEffect(() => {
     if (!user || !token) return;
