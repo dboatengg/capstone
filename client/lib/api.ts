@@ -1,8 +1,64 @@
 import { Property, Inquiry } from './types';
 
-export async function getProperties(): Promise<Property[] | null> {
+// export async function getProperties(): Promise<Property[] | null> {
+//   try {
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
+//       cache: 'no-store',
+//     });
+
+//     if (!res.ok) {
+//       console.error('Failed to fetch properties:', res.status);
+//       return null;
+//     }
+
+//     return res.json();
+//   } catch (error) {
+//     console.error('Network error fetching properties:', error);
+//     return null;
+//   }
+// }
+
+type PropertyFilters = {
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+};
+
+export async function getProperties(
+  filters: PropertyFilters = {}
+): Promise<Property[] | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
+    const params = new URLSearchParams();
+
+    if (filters.search) {
+      params.set('search', filters.search);
+    }
+
+    if (filters.minPrice !== undefined) {
+      params.set('minPrice', String(filters.minPrice));
+    }
+
+    if (filters.maxPrice !== undefined) {
+      params.set('maxPrice', String(filters.maxPrice));
+    }
+
+    if (filters.bedrooms !== undefined) {
+      params.set('bedrooms', String(filters.bedrooms));
+    }
+
+    if (filters.bathrooms !== undefined) {
+      params.set('bathrooms', String(filters.bathrooms));
+    }
+
+    const queryString = params.toString();
+
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/properties${
+      queryString ? `?${queryString}` : ''
+    }`;
+
+    const res = await fetch(url, {
       cache: 'no-store',
     });
 
