@@ -28,12 +28,13 @@ export default function Home() {
           </span>
 
           <h1 className="font-display text-5xl sm:text-6xl leading-[1.1] text-[var(--color-ink)]">
-            Find your next home, wherever you&apos;re rooted.
+            {/* Find your next home, wherever you&apos;re rooted. */}
+            Find the home you&apos;ve been looking for.
           </h1>
 
           <p className="text-lg text-[var(--color-ink)]/70 mt-6 leading-relaxed max-w-lg">
             Capstone connects you directly with trusted agents across Ghana.
-            Browse verified listings for rent or sale. No Middlemen.
+            Browse verified listings for rent or sale. 
           </p>
 
           <div className="flex flex-wrap gap-4 mt-10">
