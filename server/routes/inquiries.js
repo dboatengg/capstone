@@ -16,15 +16,28 @@ const inquirySelect = {
 }
 
 // get all inquiries — scoped to the logged-in agent's own properties
+// router.get('/', requireAuth, requireAgent, async (req, res) => {
+//   const agentId = req.user.userId
+
+//   const inquiries = await prisma.inquiry.findMany({
+//     where: {
+//       property: {
+//         agentId: agentId
+//       }
+//     },
+//     select: inquirySelect
+//   })
+
+//   res.json(inquiries);
+// })
+
+// get all inquiries — admins see everything, agents see only their own properties' inquiries
 router.get('/', requireAuth, requireAgent, async (req, res) => {
   const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
 
   const inquiries = await prisma.inquiry.findMany({
-    where: {
-      property: {
-        agentId: agentId
-      }
-    },
+    where: isAdmin ? {} : { property: { agentId } },
     select: inquirySelect
   })
 
@@ -65,6 +78,7 @@ router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (r
 router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, async (req, res) => {
   const { id } = req.params
   const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
 
   const inquiry = await prisma.inquiry.findUnique({
     where: { id },
@@ -72,8 +86,9 @@ router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, a
   })
   if (!inquiry) throw new AppError('Inquiry not found', 404)
 
-  // only the agent who owns the property this inquiry is about can update it
-  if (inquiry.property.agentId !== agentId) {
+  const isOwner = inquiry.property.agentId === agentId
+
+  if (!isOwner && !isAdmin) {
     throw new AppError('You are not authorized to update this inquiry', 403)
   }
 
