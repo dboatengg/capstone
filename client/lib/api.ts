@@ -1,4 +1,4 @@
-import { Property, Inquiry } from './types';
+import { Property, Inquiry, AdminAgent } from './types';
 
 // export async function getProperties(): Promise<Property[] | null> {
 //   try {
@@ -255,6 +255,47 @@ export async function updateProperty(
     return { success: true, property: data };
   } catch (err) {
     console.error('Network error updating property:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+// 
+export async function getAgents(token: string): Promise<AdminAgent[] | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch agents:', res.status);
+      return null;
+    }
+
+    return res.json();
+  } catch (err) {
+    console.error('Network error fetching agents:', err);
+    return null;
+  }
+}
+
+export async function deleteAgent(
+  id: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Failed to delete agent' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error deleting agent:', err);
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }

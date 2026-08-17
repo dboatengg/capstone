@@ -7,6 +7,7 @@ import RequireAuth from '@/components/RequireAuth';
 const TABS = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/properties', label: 'Properties' },
+  { href: '/admin/agents', label: 'Agents' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

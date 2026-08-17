@@ -38,3 +38,13 @@ export type Inquiry = {
     email: string;
   };
 };
+
+export type AdminAgent = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  whatsapp: string | null;
+  role: string;
+  properties: { id: string }[];
+};
