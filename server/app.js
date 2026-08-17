@@ -19,7 +19,7 @@ app.use(morgan('dev'))
 app.use(cors ({
     origin: [
       'http://localhost:4000',
-      'https://capstone-frontend-rust.vercel.app' 
+      'https://capstonne.vercel.app' 
     ], 
     credentials: true
 }))
