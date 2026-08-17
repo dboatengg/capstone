@@ -63,8 +63,17 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params
   const client = await prisma.client.findUnique({ where: { id } })
   if (!client) throw new AppError('Client not found', 404)
+
+  const inquiryCount = await prisma.inquiry.count({ where: { clientId: id } })
+  if (inquiryCount > 0) {
+    throw new AppError(
+      `Cannot delete this client — they have ${inquiryCount} inquir${inquiryCount === 1 ? 'y' : 'ies'} on record. Delete those first.`,
+      400
+    )
+  }
+
   await prisma.client.delete({ where: { id } })
-  res.status(204).send();
+  res.status(204).send()
 })
 
 export default router

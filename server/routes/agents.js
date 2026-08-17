@@ -62,6 +62,15 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params
   const agent = await prisma.agent.findUnique({ where: { id } })
   if (!agent) throw new AppError('Agent not found', 404)
+
+  const propertyCount = await prisma.property.count({ where: { agentId: id } })
+  if (propertyCount > 0) {
+    throw new AppError(
+      `Cannot delete this agent — they still have ${propertyCount} propert${propertyCount === 1 ? 'y' : 'ies'} listed. Reassign or delete those first.`,
+      400
+    )
+  }
+
   await prisma.agent.delete({ where: { id } })
   res.status(204).send()
 })
