@@ -7,6 +7,7 @@ import inquiryRoutes from './routes/inquiries.js'
 import authRoutes from './routes/auth.js'
 import propertyRoutes from './routes/properties.js'
 import errorHandler from './middleware/errorHandler.js'
+import adminRoutes from './routes/admin.js'
 import cors from 'cors'
 
 // express app setup
@@ -31,6 +32,7 @@ app.use('/api/agents', agentRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/inquiries', inquiryRoutes)
 app.use('/api/properties', propertyRoutes)
+app.use('/api/admin', adminRoutes)
 
 // root route
 app.get('/', (req, res) => {
