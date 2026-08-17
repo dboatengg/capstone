@@ -67,7 +67,7 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const inquiryCount = await prisma.inquiry.count({ where: { clientId: id } })
   if (inquiryCount > 0) {
     throw new AppError(
-      `Cannot delete this client — they have ${inquiryCount} inquir${inquiryCount === 1 ? 'y' : 'ies'} on record. Delete those first.`,
+      `Cannot delete this client - they have ${inquiryCount} inquir${inquiryCount === 1 ? 'y' : 'ies'} on record. Delete those first.`,
       400
     )
   }
