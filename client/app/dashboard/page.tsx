@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="font-display text-3xl text-[var(--color-ink)]">
             Welcome back, {user?.name}
@@ -57,7 +57,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/properties/new"
-          className="bg-[var(--color-forest)] text-white text-sm font-medium px-5 py-3 hover:bg-[var(--color-ink)] transition-colors"
+          className="self-start sm:self-auto bg-[var(--color-forest)] text-white text-sm font-medium px-5 py-3 hover:bg-[var(--color-ink)] transition-colors"
           style={{ clipPath: 'polygon(0 0, 100% 0, 100% 70%, 96% 100%, 0 100%)' }}
         >
           + Create Listing
