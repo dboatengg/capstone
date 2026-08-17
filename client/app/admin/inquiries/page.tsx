@@ -35,6 +35,7 @@ export default function AdminInquiriesPage() {
           key={inquiry.id}
           inquiry={inquiry}
           showDelete
+          showAgent
           onDeleted={handleDeleted}
         />
       ))}

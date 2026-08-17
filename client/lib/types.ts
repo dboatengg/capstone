@@ -31,6 +31,10 @@ export type Inquiry = {
     id: string;
     title: string;
     location: string;
+    agent: {
+      id: string;
+      name: string;
+    };
   };
   client: {
     id: string;

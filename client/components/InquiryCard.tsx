@@ -18,10 +18,11 @@ const STATUS_COLORS: Record<string, string> = {
 type Props = {
   inquiry: Inquiry;
   showDelete?: boolean;
+  showAgent?: boolean;
   onDeleted?: (id: string) => void;
 };
 
-export default function InquiryCard({ inquiry, showDelete = false, onDeleted }: Props) {
+export default function InquiryCard({ inquiry, showDelete = false, showAgent = false, onDeleted }: Props) {
   const { token } = useAuth();
   const [status, setStatus] = useState(inquiry.status);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -69,6 +70,11 @@ export default function InquiryCard({ inquiry, showDelete = false, onDeleted }: 
         <div>
           <p className="font-medium text-[var(--color-ink)]">{inquiry.property.title}</p>
           <p className="text-sm text-[var(--color-ink)]/50">{inquiry.property.location}</p>
+          {showAgent && (
+            <p className="text-xs text-[var(--color-ink)]/40 mt-1">
+              Agent: {inquiry.property.agent.name}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
