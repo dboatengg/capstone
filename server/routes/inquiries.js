@@ -11,7 +11,14 @@ const inquirySelect = {
   message: true,
   status: true,
   createdAt: true,
-  property: { select: { id: true, title: true, location: true } },
+  property: {
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      agent: { select: { id: true, name: true } }
+    }
+  },
   client: { select: { id: true, name: true, email: true } }
 }
 
