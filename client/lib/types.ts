@@ -48,3 +48,10 @@ export type AdminAgent = {
   role: string;
   properties: { id: string }[];
 };
+
+export type AdminClient = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+};

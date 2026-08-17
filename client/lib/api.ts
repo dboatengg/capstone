@@ -299,3 +299,45 @@ export async function deleteAgent(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+import { AdminClient } from './types';
+
+export async function getClients(token: string): Promise<AdminClient[] | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch clients:', res.status);
+      return null;
+    }
+
+    return res.json();
+  } catch (err) {
+    console.error('Network error fetching clients:', err);
+    return null;
+  }
+}
+
+export async function deleteClient(
+  id: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Failed to delete client' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error deleting client:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
