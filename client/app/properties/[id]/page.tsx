@@ -1,14 +1,20 @@
-import { getProperty } from '@/lib/api';
 import Link from 'next/link';
+import { getProperty } from '@/lib/api';
 import InquiryForm from '@/components/InquiryForm';
 
 export default async function PropertyDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const property = await getProperty(id);
+
+  const backHref = from === 'admin' ? '/admin/properties' : '/properties';
+  const backLabel = from === 'admin' ? '← Back to admin properties' : '← Back to listings';
 
   if (!property) {
     return (
@@ -25,9 +31,12 @@ export default async function PropertyDetailPage({
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
-        <Link href="/properties" className="inline-flex items-center gap-1 text-sm text-[var(--color-ink)]/60 hover:text-[var(--color-forest)] transition-colors mb-6">
-          ← Back to listings
-          </Link>
+      <Link
+        href={backHref}
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-ink)]/60 hover:text-[var(--color-forest)] transition-colors mb-6"
+      >
+        {backLabel}
+      </Link>
       {/* Header block — mirrors the card's colored edge + image treatment */}
       <div className="flex border border-[var(--color-stone-line)] overflow-hidden">
         <div

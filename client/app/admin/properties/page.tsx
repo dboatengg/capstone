@@ -84,12 +84,13 @@ export default function AdminPropertiesPage() {
                 </td>
                 <td className="py-3">
                   <div className="flex items-center gap-4">
-                    <Link
+                    {/* <Link
                       href={`/properties/${property.id}`}
                       className="text-[var(--color-forest)] hover:underline"
                     >
                       View
-                    </Link>
+                    </Link> */}
+                    <Link href={`/properties/${property.id}?from=admin`} className="text-[var(--color-forest)] hover:underline">View</Link>
                     <button
                       onClick={() => setPendingDelete(property)}
                       className="text-[var(--color-clay)] hover:underline"
