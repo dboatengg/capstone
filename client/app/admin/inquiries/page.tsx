@@ -16,6 +16,10 @@ export default function AdminInquiriesPage() {
     }
   }, [token]);
 
+  function handleDeleted(id: string) {
+    setInquiries((prev) => prev?.filter((i) => i.id !== id) ?? null);
+  }
+
   if (inquiries === null) {
     return <p className="text-[var(--color-ink)]/60 text-sm">Loading...</p>;
   }
@@ -27,7 +31,12 @@ export default function AdminInquiriesPage() {
   return (
     <div className="space-y-4">
       {inquiries.map((inquiry) => (
-        <InquiryCard key={inquiry.id} inquiry={inquiry} />
+        <InquiryCard
+          key={inquiry.id}
+          inquiry={inquiry}
+          showDelete
+          onDeleted={handleDeleted}
+        />
       ))}
     </div>
   );

@@ -341,3 +341,26 @@ export async function deleteClient(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+
+export async function deleteInquiry(
+  id: string,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Failed to delete inquiry' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error deleting inquiry:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
