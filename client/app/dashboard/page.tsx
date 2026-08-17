@@ -7,10 +7,12 @@ import { getProperties, getInquiries } from '@/lib/api';
 import { Property, Inquiry } from '@/lib/types';
 import InquiryCard from '@/components/InquiryCard';
 import { useRouter } from 'next/navigation';
+import { useHasMounted } from '@/hooks/useHasMounted';
 
 export default function DashboardPage() {
   const { user, token } = useAuth();
   const router = useRouter();
+  const hasMounted = useHasMounted();
   const [myListings, setMyListings] = useState<Property[] | null>(null);
   const [inquiries, setInquiries] = useState<Inquiry[] | null>(null);
 
@@ -33,9 +35,7 @@ export default function DashboardPage() {
     getInquiries(token).then(setInquiries);
   }, [user, token, isAdmin]);
 
-  // Don't render agent-dashboard content at all while we know (or suspect)
-  // this is an admin about to be redirected — avoids the flash entirely.
-  if (!user || isAdmin) {
+  if (!hasMounted || !user || isAdmin) {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
         <p className="text-[var(--color-ink)]/60">Loading...</p>
