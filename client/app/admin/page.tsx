@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import RequireAuth from '@/components/RequireAuth';
 
 type DashboardStats = {
   properties: number;
@@ -11,7 +10,7 @@ type DashboardStats = {
   inquiries: number;
 };
 
-function AdminStats() {
+export default function AdminPage() {
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState('');
@@ -56,33 +55,18 @@ function AdminStats() {
         <p className="text-sm text-[var(--color-ink)]/60">Properties</p>
         <p className="text-3xl font-display mt-2">{stats.properties}</p>
       </div>
-
       <div className="border border-[var(--color-stone-line)] p-6">
         <p className="text-sm text-[var(--color-ink)]/60">Agents</p>
         <p className="text-3xl font-display mt-2">{stats.agents}</p>
       </div>
-
       <div className="border border-[var(--color-stone-line)] p-6">
         <p className="text-sm text-[var(--color-ink)]/60">Clients</p>
         <p className="text-3xl font-display mt-2">{stats.clients}</p>
       </div>
-
       <div className="border border-[var(--color-stone-line)] p-6">
         <p className="text-sm text-[var(--color-ink)]/60">Inquiries</p>
         <p className="text-3xl font-display mt-2">{stats.inquiries}</p>
       </div>
     </div>
-  );
-}
-
-export default function AdminPage() {
-  return (
-    // <RequireAuth allowedTypes={['agent']}>
-    <RequireAuth allowedTypes={['agent']} requireRole="admin">
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <h1 className="font-display text-4xl mb-8">Admin Dashboard</h1>
-        <AdminStats />
-      </div>
-    </RequireAuth>
   );
 }
