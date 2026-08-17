@@ -62,14 +62,14 @@ export default async function PropertyDetailPage({
             )}
           </div>
 
-          <div className="p-6">
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="font-display text-3xl leading-snug text-[var(--color-ink)]">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+              <h1 className="font-display text-2xl sm:text-3xl leading-snug text-[var(--color-ink)]">
                 {property.title}
               </h1>
 
               <span
-                className="shrink-0 bg-[var(--color-brass)] text-white text-base font-semibold px-4 py-2"
+                className="self-start shrink-0 bg-[var(--color-brass)] text-white text-sm sm:text-base font-semibold px-3 sm:px-4 py-1.5 sm:py-2"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%)' }}
               >
                 GHS {property.price.toLocaleString()}{isForRent && '/mo'}
