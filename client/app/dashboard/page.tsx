@@ -14,25 +14,34 @@ export default function DashboardPage() {
   const [myListings, setMyListings] = useState<Property[] | null>(null);
   const [inquiries, setInquiries] = useState<Inquiry[] | null>(null);
 
-  useEffect(() => {
-    if (!user || !token) return;
-  
-    if (user.role === 'admin') {
-      router.replace('/admin');
-    }
-  }, [user, token, router]);
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    if (!user || !token || user.role === 'admin') return;
-  
+    if (!user || !token) return;
+    if (isAdmin) {
+      router.replace('/admin');
+    }
+  }, [user, token, isAdmin, router]);
+
+  useEffect(() => {
+    if (!user || !token || isAdmin) return;
     getProperties().then((properties) => {
       if (properties) {
         setMyListings(properties.filter((p) => p.agent.id === user.id));
       }
     });
-  
     getInquiries(token).then(setInquiries);
-  }, [user, token]);
+  }, [user, token, isAdmin]);
+
+  // Don't render agent-dashboard content at all while we know (or suspect)
+  // this is an admin about to be redirected — avoids the flash entirely.
+  if (!user || isAdmin) {
+    return (
+      <div className="max-w-md mx-auto px-6 py-16 text-center">
+        <p className="text-[var(--color-ink)]/60">Loading...</p>
+      </div>
+    );
+  }
 
   const activeCount = myListings?.filter((p) => p.available).length ?? 0;
   const totalCount = myListings?.length ?? 0;
@@ -55,7 +64,6 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4 mb-10">
         <div className="border border-[var(--color-stone-line)] bg-white p-5">
           <p className="text-xs uppercase tracking-wide text-[var(--color-ink)]/50">
@@ -77,7 +85,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent inquiries preview */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-xl text-[var(--color-ink)]">Recent Inquiries</h2>
