@@ -51,7 +51,7 @@ export default function PropertyFilters() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-8">
+    <form key={searchParams.toString()} onSubmit={handleSubmit} className="mb-8">
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="text"
@@ -72,7 +72,6 @@ export default function PropertyFilters() {
         </div>
       </div>
 
-      {/* Price Filters  */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
         <input
             type="number"
@@ -91,7 +90,6 @@ export default function PropertyFilters() {
         />
         </div>
 
-        {/* Bedroom and bathroom filters  */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
             <input
                 type="number"
