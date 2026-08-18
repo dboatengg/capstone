@@ -365,3 +365,105 @@ export async function deleteInquiry(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+
+type UpdateAgentInput = {
+  name: string;
+  email: string;
+  phone: string | null;
+  whatsapp: string | null;
+  role: string;
+};
+
+export async function updateAgent(
+  id: string,
+  input: UpdateAgentInput,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(input),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to update agent';
+      return { success: false, error: message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error updating agent:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+type UpdateClientInput = {
+  name: string;
+  email: string;
+  phone: string | null;
+};
+
+export async function updateClient(
+  id: string,
+  input: UpdateClientInput,
+  token: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(input),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const message = data.errors?.[0]?.message || data.error || 'Failed to update client';
+      return { success: false, error: message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Network error updating client:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+
+export async function getAgent(id: string, token: string): Promise<AdminAgent | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) return null;
+    return res.json();
+  } catch (err) {
+    console.error('Network error fetching agent:', err);
+    return null;
+  }
+}
+
+export async function getClient(id: string, token: string): Promise<AdminClient | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) return null;
+    return res.json();
+  } catch (err) {
+    console.error('Network error fetching client:', err);
+    return null;
+  }
+}

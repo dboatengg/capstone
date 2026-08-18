@@ -100,6 +100,12 @@ export default function AdminAgentsPage() {
                     {agent.properties.length}
                   </td>
                   <td className="py-3">
+                    <Link
+                      href={`/admin/agents/${agent.id}/edit`}
+                      className="text-[var(--color-brass)] hover:underline mr-4"
+                    >
+                      Edit
+                    </Link>
                     {isSelf ? (
                       <span className="text-[var(--color-ink)]/30">—</span>
                     ) : (

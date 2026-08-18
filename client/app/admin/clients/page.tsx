@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { getClients, deleteClient } from '@/lib/api';
 import { AdminClient } from '@/lib/types';
@@ -69,6 +70,12 @@ export default function AdminClientsPage() {
                   {client.phone ?? '—'}
                 </td>
                 <td className="py-3">
+                  <Link
+                    href={`/admin/clients/${client.id}/edit`}
+                    className="text-[var(--color-brass)] hover:underline mr-4"
+                  >
+                    Edit
+                  </Link>
                   <button
                     onClick={() => setPendingDelete(client)}
                     className="text-[var(--color-clay)] hover:underline"
