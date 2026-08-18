@@ -143,6 +143,7 @@ npm run dev
 
 ## Project structure
 
+```
 capstone/
 ├── client/                         # Next.js frontend
 │   ├── app/
@@ -212,6 +213,7 @@ capstone/
     │   └── prisma.js                  # Prisma client instance
     ├── app.js
     └── server.js
+```
 
 ---
 
