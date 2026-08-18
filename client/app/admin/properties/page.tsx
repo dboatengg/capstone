@@ -113,6 +113,12 @@ export default function AdminPropertiesPage() {
                     >
                       View
                     </Link>
+                    <Link
+                      href={`/admin/properties/${property.id}/edit`}
+                      className="text-[var(--color-brass)] hover:underline"
+                    >
+                      Edit
+                    </Link>
                     <button
                       onClick={() => setPendingDelete(property)}
                       className="text-[var(--color-clay)] hover:underline"

@@ -102,6 +102,7 @@ type CreatePropertyInput = {
   bathrooms: number;
   location: string;
   available: boolean;
+  agentId?: string;
 };
 
 export async function createProperty(
