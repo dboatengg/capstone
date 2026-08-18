@@ -45,7 +45,8 @@ router.get('/', requireAuth, requireAgent, async (req, res) => {
 
   const inquiries = await prisma.inquiry.findMany({
     where: isAdmin ? {} : { property: { agentId } },
-    select: inquirySelect
+    select: inquirySelect,
+    orderBy: { createdAt: 'asc' }
   })
 
   res.json(inquiries);

@@ -10,7 +10,10 @@ const clientSelect = {id:true, name:true, email:true, phone:true,}
 
 // get all clients
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
-  const clients = await prisma.client.findMany({select: clientSelect})
+  const clients = await prisma.client.findMany({
+    select: clientSelect,
+    orderBy: { createdAt: 'asc' }
+  })
   res.json(clients);
 })
 

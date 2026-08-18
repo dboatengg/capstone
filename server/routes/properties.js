@@ -85,6 +85,7 @@ router.get('/', async (req, res) => {
   const properties = await prisma.property.findMany({
     where,
     select: propertySelect,
+    orderBy: { createdAt: 'asc' },
   });
 
   res.json(properties);

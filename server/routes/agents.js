@@ -10,7 +10,10 @@ const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, 
 
 // get all agents
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
-  const agents = await prisma.agent.findMany({select: agentSelect})
+  const agents = await prisma.agent.findMany({
+    select: agentSelect,
+    orderBy: { createdAt: 'asc' }
+  })
   res.json(agents);
 })
 
