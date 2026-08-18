@@ -107,18 +107,28 @@ router.post('/', requireAuth, requireAgent, validatePropertyMiddleware, async (r
 
 // update property
 router.put('/:id', requireAuth, requireAgent, validateUpdatePropertyMiddleware, async (req, res) => {
-    const { id } = req.params
-    const property = await prisma.property.findUnique({ where: { id } })
-    if (!property) throw new AppError('Property not found', 404)
-    
-    // only the agent who owns this property can update it
-    if (property.agentId !== req.user.userId) {
-      throw new AppError('You are not authorized to update this property', 403)
-    }
-    
-    const updated = await prisma.property.update({ where: { id }, data: req.body, select: propertySelect })
-    res.json(updated)
-  })
+  const { id } = req.params
+  const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
+
+  const property = await prisma.property.findUnique({ where: { id } })
+  if (!property) throw new AppError('Property not found', 404)
+
+  const isOwner = property.agentId === agentId
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this property', 403)
+  }
+
+  // only an admin may reassign a property to a different agent
+  const data = { ...req.body }
+  if (!isAdmin) {
+    delete data.agentId
+  }
+
+  const updated = await prisma.property.update({ where: { id }, data, select: propertySelect })
+  res.json(updated)
+})
 
 // delete property — admin can delete any property, agent can only delete their own
 router.delete('/:id', requireAuth, requireAgent, async (req, res) => {
