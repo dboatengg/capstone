@@ -4,7 +4,10 @@ import {z} from 'zod'
 const agentSchema = z.object({
     name: z.string().min(1, 'Name is required').regex(/^[a-zA-Z\s]+$/, 'Name must contain only letters'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters')
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    phone: z.string().nullable().optional(),
+    whatsapp: z.string().nullable().optional(),
+    role: z.enum(['agent', 'admin']).optional(),
 })
 
 const updateAgentSchema = agentSchema.partial();
@@ -30,10 +33,11 @@ export const validateUpdateAgentMiddleware = (req, res, next) => {
 const clientSchema = z.object({
     name: z.string().min(1, 'Name is required').regex(/^[a-zA-Z\s]+$/, 'Name must contain only letters'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters')
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    phone: z.string().nullable().optional(),
 })
 
-const updateClientSchema = agentSchema.partial();
+const updateClientSchema = clientSchema.partial();
 
 export const validateClient = (data) => {return clientSchema.safeParse(data)}
 export const validateUpdateClient = (data) => {return updateClientSchema.safeParse(data)}
@@ -51,7 +55,6 @@ export const validateUpdateClientMiddleware = (req, res, next) => {
     req.body = result.data;
     next();
 }
-
 
 /***********************Inquiries***********************/
 const inquirySchema = z.object({
