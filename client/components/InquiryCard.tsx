@@ -104,19 +104,18 @@ export default function InquiryCard({ inquiry, showDelete = false, showAgent = f
 
           <div className="flex items-center gap-3 self-start">
             <div className="relative" ref={statusRef}>
-              <button
-                type="button"
-                onClick={() => setIsStatusOpen((open) => !open)}
-                disabled={isUpdating}
-                className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide pl-2.5 pr-2 py-1.5 border transition-opacity disabled:opacity-50"
-                style={{
-                  color: STATUS_COLORS[status],
-                  borderColor: STATUS_COLORS[status],
-                }}
+            <button type="button" onClick={() => setIsStatusOpen((open) => !open)} disabled={isUpdating}
+                className={`flex items-center gap-2 text-xs font-medium uppercase tracking-wide pl-2.5 pr-2 py-1.5 border transition-opacity disabled:opacity-50 ${
+                  status === 'converted' ? 'text-white' : ''}`}
+                style={
+                  status === 'converted'
+                    ? { backgroundColor: STATUS_COLORS[status], borderColor: STATUS_COLORS[status] }
+                    : { color: STATUS_COLORS[status], borderColor: STATUS_COLORS[status] }
+                }
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ backgroundColor: STATUS_COLORS[status] }}
+                  style={{ backgroundColor: status === 'converted' ? 'white' : STATUS_COLORS[status] }}
                 />
                 {isUpdating ? 'Saving…' : STATUS_LABELS[status]}
                 <svg
