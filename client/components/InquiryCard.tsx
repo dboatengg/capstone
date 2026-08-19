@@ -87,7 +87,7 @@ export default function InquiryCard({ inquiry, showDelete = false, showAgent = f
   }
 
   return (
-    <div className="flex border border-[var(--color-stone-line)] bg-white overflow-hidden">
+    <div className="flex border border-[var(--color-stone-line)] bg-white">
       <div className="w-1.5 shrink-0" style={{ backgroundColor: STATUS_COLORS[status] }} />
 
       <div className="flex-1 p-5">
