@@ -98,7 +98,8 @@ const propertySchema = z.object({
   })
   
   const updatePropertySchema = propertySchema.partial().extend({
-    available: z.boolean().optional()
+    available: z.boolean().optional(),
+    agentId: z.string().uuid('Invalid agent ID').optional()
   })
 
 export const validateProperty = (data) => {return propertySchema.safeParse(data)}
