@@ -4,19 +4,37 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useHasMounted } from '@/hooks/useHasMounted';
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
+  const hasMounted = useHasMounted();
+
+  const isAdmin = user?.role === 'admin';
+  const isAgent = user?.userType === 'agent' && !isAdmin;
+  const isClient = user?.userType === 'client';
 
   useEffect(() => {
-    if (user?.userType === 'agent') {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
+    if (!hasMounted) return;
 
-  if (user?.userType === 'agent') {
-    return null;
+    if (isAdmin) {
+      router.replace('/admin');
+    } else if (isAgent) {
+      router.replace('/dashboard');
+    } else if (isClient) {
+      router.replace('/home');
+    }
+  }, [hasMounted, isAdmin, isAgent, isClient, router]);
+
+  // Don't render the public homepage at all until we know for certain
+  // this visitor isn't logged in — avoids flashing it before redirecting.
+  if (!hasMounted || isAdmin || isAgent || isClient) {
+    return (
+      <div className="min-h-[calc(100vh-73px)] flex items-center justify-center">
+        <p className="text-[var(--color-ink)]/60">Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -28,13 +46,11 @@ export default function Home() {
           </span>
 
           <h1 className="font-display text-5xl sm:text-6xl leading-[1.1] text-[var(--color-ink)]">
-            {/* Find your next home, wherever you&apos;re rooted. */}
-            Find the home you&apos;ve been looking for.
+          Find the home you&apos;ve been looking for.
           </h1>
 
           <p className="text-lg text-[var(--color-ink)]/70 mt-6 leading-relaxed max-w-lg">
-            Capstone connects you directly with trusted agents across Ghana.
-            Browse verified listings for rent or sale. 
+          Capstone connects you directly with trusted agents across Ghana. Browse verified listings for rent or sale.
           </p>
 
           <div className="flex flex-wrap gap-4 mt-10">
