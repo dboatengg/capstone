@@ -72,7 +72,7 @@ model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  userType  String   // 'agent' or 'client'
+  userType  String   
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
