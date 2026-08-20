@@ -20,8 +20,11 @@ export default function Nav() {
     router.push('/');
   }
 
-  const isAgent = user?.userType === 'agent';
+  const isAdmin = user?.role === 'admin';
+  const isAgent = user?.userType === 'agent' && !isAdmin;
   const isClient = user?.userType === 'client';
+
+  const logoHref = isAdmin ? '/admin' : isAgent ? '/dashboard' : isClient ? '/home' : '/';
 
   const linkClass =
     'text-sm font-medium text-[var(--color-ink)]/70 hover:text-[var(--color-forest)] transition-colors';
@@ -32,7 +35,7 @@ export default function Nav() {
     <header className="border-b border-[var(--color-stone-line)] bg-white relative">
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link
-          href={isAgent ? '/dashboard' : isClient ? '/home' : '/'}
+          href={logoHref}
           className="font-display text-xl text-[var(--color-ink)]"
           onClick={() => setIsMenuOpen(false)}
         >
@@ -41,6 +44,12 @@ export default function Nav() {
 
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-6">
+          {isAdmin && (
+            <Link href="/admin" className={linkClass}>
+              Admin
+            </Link>
+          )}
+
           {isAgent && (
             <Link href="/dashboard" className={linkClass}>
               Dashboard
@@ -87,6 +96,12 @@ export default function Nav() {
       {/* Mobile menu panel */}
       {isMenuOpen && (
         <div className="sm:hidden border-t border-[var(--color-stone-line)] bg-white px-6 py-2">
+          {isAdmin && (
+            <Link href="/admin" className={mobileLinkClass} onClick={() => setIsMenuOpen(false)}>
+              Admin
+            </Link>
+          )}
+
           {isAgent && (
             <Link href="/dashboard" className={mobileLinkClass} onClick={() => setIsMenuOpen(false)}>
               Dashboard
