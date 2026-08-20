@@ -66,6 +66,18 @@ function clearStoredAuth() {
   notifyListeners();
 }
 
+export function updateStoredToken(newToken: string) {
+  const userRaw = localStorage.getItem('user');
+  if (userRaw) {
+    localStorage.setItem('token', newToken);
+    notifyListeners();
+  }
+}
+
+export function clearStoredAuthPublic() {
+  clearStoredAuth();
+}
+
 type AuthContextType = {
   user: AuthUser | null;
   token: string | null;
