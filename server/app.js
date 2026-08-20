@@ -9,11 +9,13 @@ import propertyRoutes from './routes/properties.js'
 import errorHandler from './middleware/errorHandler.js'
 import adminRoutes from './routes/admin.js'
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 
 // express app setup
 const app = express();
 
 // middleware
+app.use(cookieParser());
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors ({

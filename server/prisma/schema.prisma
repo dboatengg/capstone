@@ -67,3 +67,12 @@ model Inquiry {
 
   @@unique([clientId, propertyId])
 }
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  userType  String   // 'agent' or 'client'
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
