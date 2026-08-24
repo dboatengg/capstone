@@ -263,13 +263,6 @@ export default function EditPropertyPage() {
 
         {error && <p className="text-sm text-[var(--color-clay)]">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-[var(--color-forest)] text-white text-sm font-medium py-3 hover:bg-[var(--color-ink)] transition-colors disabled:opacity-50"
-        >
-          {isSubmitting ? 'Saving...' : 'Save changes'}
-        </button>
         <div>
   <label className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
     Photos
@@ -278,17 +271,17 @@ export default function EditPropertyPage() {
   {images.length > 0 && (
     <div className="grid grid-cols-3 gap-3 mb-3">
       {images.map((url) => (
-        <div key={url} className="relative">
-          <Image src={url} alt="" className="w-full h-24 object-cover" />
-          <button
-            type="button"
-            onClick={() => handleDeleteImage(url)}
-            className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
+  <div key={url} className="relative">
+    <Image src={url} fill alt="" className="w-full h-24 object-cover" />
+    <button
+      type="button"
+      onClick={() => handleDeleteImage(url)}
+      className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1"
+    >
+      ✕
+    </button>
+  </div>
+))}
     </div>
   )}
 
@@ -308,6 +301,13 @@ export default function EditPropertyPage() {
     {isUploading ? 'Uploading...' : 'Upload photos'}
   </button>
 </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-[var(--color-forest)] text-white text-sm font-medium py-3 hover:bg-[var(--color-ink)] transition-colors disabled:opacity-50"
+        >
+          {isSubmitting ? 'Saving...' : 'Save changes'}
+        </button>
       </form>
     </div>
   );

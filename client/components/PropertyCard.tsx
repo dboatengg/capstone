@@ -20,6 +20,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           <div className="relative h-44 bg-[var(--color-ink)] flex items-end p-4 overflow-hidden">
           {property.images.length > 0 ? (
             <Image
+            fill
               src={property.images[0]}
               alt={property.title}
               className="absolute inset-0 w-full h-full object-cover"
