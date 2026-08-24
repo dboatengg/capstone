@@ -97,6 +97,16 @@ Live admin credentials are available on request — reach out at [dicksonboateng
 
 ---
 
+
+## A note on hosting
+
+This project runs on free hosting tiers (Vercel + Railway), which means the 
+backend can spin down after periods of inactivity. If you're testing the 
+live site and nothing loads on the first try, give it 10-15 seconds and 
+reload. It just needs a moment to wake back up.
+
+---
+
 ## Getting started
 
 ### Prerequisites
