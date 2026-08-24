@@ -1,3 +1,4 @@
+import { upload } from '../config/cloudinary.js'
 import express from 'express';      
 import prisma from '../db/prisma.js';
 import { validatePropertyMiddleware, validateUpdatePropertyMiddleware } from '../utils/validate.js';
@@ -6,7 +7,7 @@ import AppError from '../utils/AppError.js';
 
 const router = express.Router();   
 
-const propertySelect = {
+  const propertySelect = {
     id: true,
     title: true,
     shortDescription: true,
@@ -17,6 +18,7 @@ const propertySelect = {
     bedrooms: true,
     bathrooms: true,
     location: true,
+    images: true,
     createdAt: true,
     updatedAt: true,
     agent: {
@@ -25,11 +27,6 @@ const propertySelect = {
   }
 
 // get all properties
-// router.get('/', async (req, res) => {
-//     const properties = await prisma.property.findMany({select: propertySelect})
-//     res.json(properties);
-// })
-
 router.get('/', async (req, res) => {
   const {
     search,
@@ -91,6 +88,8 @@ router.get('/', async (req, res) => {
   res.json(properties);
 });
 
+
+
 // get single property
 router.get('/:id', async (req, res) => {
     const { id } = req.params
@@ -147,5 +146,61 @@ router.delete('/:id', requireAuth, requireAgent, async (req, res) => {
   await prisma.property.delete({ where: { id } })
   res.status(204).send();
 })
+
+
+
+// upload images to a property — owner agent or admin only
+router.post('/:id/images', requireAuth, requireAgent, upload.array('images', 10), async (req, res) => {
+  const { id } = req.params
+  const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
+
+  const property = await prisma.property.findUnique({ where: { id } })
+  if (!property) throw new AppError('Property not found', 404)
+
+  const isOwner = property.agentId === agentId
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this property', 403)
+  }
+
+  if (!req.files || req.files.length === 0) {
+    throw new AppError('No images provided', 400)
+  }
+
+  const newImageUrls = req.files.map(file => file.path)
+
+  const updated = await prisma.property.update({
+    where: { id },
+    data: { images: [...property.images, ...newImageUrls] },
+    select: propertySelect,
+  })
+
+  res.json(updated)
+})
+
+// remove a single image from a property — owner agent or admin only
+router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
+  const { id } = req.params
+  const { imageUrl } = req.body
+  const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
+
+  const property = await prisma.property.findUnique({ where: { id } })
+  if (!property) throw new AppError('Property not found', 404)
+
+  const isOwner = property.agentId === agentId
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this property', 403)
+  }
+
+  const updated = await prisma.property.update({
+    where: { id },
+    data: { images: property.images.filter(img => img !== imageUrl) },
+    select: propertySelect,
+  })
+
+  res.json(updated)
+})
+
 
 export default router;

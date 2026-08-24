@@ -47,6 +47,7 @@ model Property {
   bedrooms         Int
   bathrooms        Int
   location         String
+  images           String[]  @default([])
   agentId          String
   agent            Agent     @relation(fields: [agentId], references: [id])
   inquiries        Inquiry[]
