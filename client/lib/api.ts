@@ -1,6 +1,4 @@
-import { Property, Inquiry, AdminAgent } from './types';
-import { authFetch } from './authFetch';
-
+import { Property, Inquiry, AdminAgent } from './types'
 
 type PropertyFilters = {
   search?: string;
@@ -198,11 +196,10 @@ export async function deleteProperty(
   token: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const res = await authFetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`,
-      { method: 'DELETE' },
-      token
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
