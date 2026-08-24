@@ -1,23 +1,6 @@
 import { Property, Inquiry, AdminAgent } from './types';
 import { authFetch } from './authFetch';
 
-// export async function getProperties(): Promise<Property[] | null> {
-//   try {
-//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties`, {
-//       cache: 'no-store',
-//     });
-
-//     if (!res.ok) {
-//       console.error('Failed to fetch properties:', res.status);
-//       return null;
-//     }
-
-//     return res.json();
-//   } catch (error) {
-//     console.error('Network error fetching properties:', error);
-//     return null;
-//   }
-// }
 
 type PropertyFilters = {
   search?: string;

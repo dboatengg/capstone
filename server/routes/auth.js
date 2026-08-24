@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 const router = express.Router()
 
-const ACCESS_TOKEN_EXPIRY = '15m'
+const ACCESS_TOKEN_EXPIRY = '20s'
 const REFRESH_TOKEN_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 const validate = (schema) => {
