@@ -449,3 +449,59 @@ export async function getClient(id: string, token: string): Promise<AdminClient 
     return null;
   }
 }
+
+export async function uploadPropertyImages(
+  id: string,
+  files: File[],
+  token: string
+): Promise<{ success: true; property: Property } | { success: false; error: string }> {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}/images`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to upload images' };
+    }
+
+    return { success: true, property: data };
+  } catch (err) {
+    console.error('Network error uploading images:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+export async function deletePropertyImage(
+  id: string,
+  imageUrl: string,
+  token: string
+): Promise<{ success: true; property: Property } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}/images`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ imageUrl }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to delete image' };
+    }
+
+    return { success: true, property: data };
+  } catch (err) {
+    console.error('Network error deleting image:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}

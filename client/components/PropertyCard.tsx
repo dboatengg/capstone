@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Property } from '../lib/types';
 
 export default function PropertyCard({ property }: { property: Property }) {
@@ -17,6 +18,13 @@ export default function PropertyCard({ property }: { property: Property }) {
         <div className="flex-1">
           {/* Placeholder image block — patterned, keyed to location, until real photos exist */}
           <div className="relative h-44 bg-[var(--color-ink)] flex items-end p-4 overflow-hidden">
+          {property.images.length > 0 ? (
+            <Image
+              src={property.images[0]}
+              alt={property.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -24,16 +32,8 @@ export default function PropertyCard({ property }: { property: Property }) {
                   'repeating-linear-gradient(135deg, transparent, transparent 12px, rgba(239,235,226,0.4) 12px, rgba(239,235,226,0.4) 13px)',
               }}
             />
-            <span className="relative text-[var(--color-paper)] text-xs font-medium tracking-wide uppercase">
-              {property.location}
-            </span>
-
-            {!property.available && (
-              <span className="absolute top-3 right-3 bg-[var(--color-clay)] text-white text-xs font-medium px-2 py-1">
-                Unavailable
-              </span>
-            )}
-          </div>
+          )}
+        </div>
 
           <div className="p-5">
             <h2 className="font-display text-xl leading-snug text-[var(--color-ink)] group-hover:text-[var(--color-forest)] transition-colors">

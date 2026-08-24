@@ -20,6 +20,7 @@ export type Property = {
   createdAt: string;
   updatedAt: string;
   agent: Agent;
+  images: string[];
 };
 
 export type Inquiry = {

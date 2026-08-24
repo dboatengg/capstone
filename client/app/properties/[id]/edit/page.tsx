@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { getProperty, updateProperty } from '@/lib/api';
+import { uploadPropertyImages, deletePropertyImage } from '@/lib/api';
 
 export default function EditPropertyPage() {
   const { token } = useAuth();
@@ -22,6 +24,9 @@ export default function EditPropertyPage() {
   const [bathrooms, setBathrooms] = useState('');
   const [location, setLocation] = useState('');
   const [available, setAvailable] = useState(true);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,6 +48,7 @@ export default function EditPropertyPage() {
       setBathrooms(String(property.bathrooms));
       setLocation(property.location);
       setAvailable(property.available);
+      setImages(property.images);
       setIsLoading(false);
     });
   }, [params.id]);
@@ -75,6 +81,33 @@ export default function EditPropertyPage() {
     }
 
     router.push(`/properties/${params.id}`);
+  }
+
+  async function handleUploadImages() {
+    if (selectedFiles.length === 0) return;
+    setIsUploading(true);
+  
+    const result = await uploadPropertyImages(params.id, selectedFiles, token!);
+  
+    if (result.success) {
+      setImages(result.property.images);
+      setSelectedFiles([]);
+    } else {
+      setError(result.error);
+    }
+  
+    setIsUploading(false);
+  }
+  
+  async function handleDeleteImage(imageUrl: string) {
+    const result = await deletePropertyImage(params.id, imageUrl, token!);
+    if (result.success) {
+      setImages(result.property.images);
+    }
+  }
+  
+  if (isLoading) {
+    return <p className="text-[var(--color-ink)]/60 text-sm">Loading...</p>;
   }
 
   if (isLoading) {
@@ -237,6 +270,44 @@ export default function EditPropertyPage() {
         >
           {isSubmitting ? 'Saving...' : 'Save changes'}
         </button>
+        <div>
+  <label className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
+    Photos
+  </label>
+
+  {images.length > 0 && (
+    <div className="grid grid-cols-3 gap-3 mb-3">
+      {images.map((url) => (
+        <div key={url} className="relative">
+          <Image src={url} alt="" className="w-full h-24 object-cover" />
+          <button
+            type="button"
+            onClick={() => handleDeleteImage(url)}
+            className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={(e) => setSelectedFiles(Array.from(e.target.files ?? []))}
+    className="w-full border border-[var(--color-stone-line)] px-3 py-2"
+  />
+  <button
+    type="button"
+    onClick={handleUploadImages}
+    disabled={isUploading || selectedFiles.length === 0}
+    className="mt-2 bg-[var(--color-brass)] text-white text-sm font-medium px-4 py-2 disabled:opacity-50"
+  >
+    {isUploading ? 'Uploading...' : 'Upload photos'}
+  </button>
+</div>
       </form>
     </div>
   );
