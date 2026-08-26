@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 export default function PropertyGallery({
   images,
@@ -30,7 +31,6 @@ export default function PropertyGallery({
     setActiveIndex((i) => (i - 1 + images.length) % images.length);
   }
 
-  // Keyboard navigation while the lightbox is open
   useEffect(() => {
     if (!isLightboxOpen) return;
 
@@ -46,7 +46,6 @@ export default function PropertyGallery({
 
   return (
     <div>
-      {/* Hero image area */}
       <div className="relative h-64 sm:h-96 bg-[var(--color-ink)] overflow-hidden">
         {images.length > 0 ? (
           <button
@@ -55,13 +54,7 @@ export default function PropertyGallery({
             className="absolute inset-0 cursor-zoom-in"
             aria-label="View full-size image"
           >
-            <Image
-              src={images[activeIndex]}
-              alt={title}
-              fill
-              priority
-              className="object-cover"
-            />
+            <Image src={images[activeIndex]} alt={title} fill priority className="object-cover" />
           </button>
         ) : (
           <div
@@ -86,7 +79,6 @@ export default function PropertyGallery({
         )}
       </div>
 
-      {/* Thumbnail strip */}
       {images.length > 1 && (
         <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
           {images.map((url, index) => (
@@ -106,38 +98,34 @@ export default function PropertyGallery({
         </div>
       )}
 
-      {/* Lightbox */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-ink)]/95 px-4">
           <button
             type="button"
             onClick={() => setIsLightboxOpen(false)}
             aria-label="Close"
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors z-10"
           >
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <path
-                d="M7 7L21 21M21 7L7 21"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
+              <path d="M7 7L21 21M21 7L7 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
 
           {images.length > 1 && (
-            <span className="absolute top-4 left-4 sm:top-6 sm:left-6 text-[var(--color-paper)]/60 text-sm font-medium">
+            <span className="absolute top-4 left-4 sm:top-6 sm:left-6 text-[var(--color-paper)]/60 text-sm font-medium z-10">
               {activeIndex + 1} / {images.length}
             </span>
           )}
 
+          {/* Zoomable/pannable image area — key resets zoom state whenever the active image changes */}
           <div className="relative w-full max-w-4xl h-[70vh]">
-            <Image
-              src={images[activeIndex]}
-              alt={title}
-              fill
-              className="object-contain"
-            />
+            <TransformWrapper key={activeIndex} initialScale={1} minScale={1} maxScale={4} centerOnInit>
+              <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }} contentStyle={{ width: '100%', height: '100%' }}>
+                <div className="relative w-full h-full">
+                  <Image src={images[activeIndex]} alt={title} fill className="object-contain" />
+                </div>
+              </TransformComponent>
+            </TransformWrapper>
           </div>
 
           {images.length > 1 && (
@@ -146,16 +134,10 @@ export default function PropertyGallery({
                 type="button"
                 onClick={showPrev}
                 aria-label="Previous image"
-                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors p-2"
+                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors p-2 z-10"
               >
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                  <path
-                    d="M20 8L12 16L20 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M20 8L12 16L20 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
 
@@ -163,16 +145,10 @@ export default function PropertyGallery({
                 type="button"
                 onClick={showNext}
                 aria-label="Next image"
-                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors p-2"
+                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-[var(--color-paper)] hover:text-[var(--color-brass)] transition-colors p-2 z-10"
               >
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                  <path
-                    d="M12 8L20 16L12 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M12 8L20 16L12 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
 
@@ -184,15 +160,15 @@ export default function PropertyGallery({
                     onClick={() => setActiveIndex(index)}
                     aria-label={`Go to image ${index + 1}`}
                     className={`h-1.5 transition-all ${
-                      index === activeIndex
-                        ? 'w-6 bg-[var(--color-brass)]'
-                        : 'w-1.5 bg-[var(--color-paper)]/40'
+                      index === activeIndex ? 'w-6 bg-[var(--color-brass)]' : 'w-1.5 bg-[var(--color-paper)]/40'
                     }`}
                   />
                 ))}
               </div>
             </>
           )}
+
+          <p className="text-[var(--color-paper)]/40 text-xs mt-3">Scroll or pinch to zoom · Drag to pan</p>
         </div>
       )}
     </div>
