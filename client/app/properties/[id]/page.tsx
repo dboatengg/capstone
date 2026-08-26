@@ -44,21 +44,7 @@ export default async function PropertyDetailPage({
           className={`w-2 shrink-0 ${isForRent ? 'bg-[var(--color-forest)]' : 'bg-[var(--color-brass)]'}`}
         />
         <div className="flex-1">
-        <div className="relative">
-          <PropertyGallery images={property.images} title={property.title} />
-
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-6 pointer-events-none">
-            <span className="text-[var(--color-paper)] text-sm font-medium tracking-wide uppercase">
-              {property.location}
-            </span>
-          </div>
-
-          {!property.available && (
-            <span className="absolute top-4 right-4 bg-[var(--color-clay)] text-white text-xs font-medium px-2 py-1">
-              Unavailable
-            </span>
-          )}
-        </div>
+        <PropertyGallery images={property.images} title={property.title} location={property.location} isAvailable={property.available}/>
 
           <div className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">

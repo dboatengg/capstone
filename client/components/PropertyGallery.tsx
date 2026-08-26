@@ -3,37 +3,55 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-export default function PropertyGallery({ images, title }: { images: string[]; title: string }) {
+export default function PropertyGallery({
+  images,
+  title,
+  location,
+  isAvailable,
+}: {
+  images: string[];
+  title: string;
+  location: string;
+  isAvailable: boolean;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
-
-  if (images.length === 0) {
-    return (
-      <div className="relative h-64 sm:h-96 bg-[var(--color-ink)] overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(135deg, transparent, transparent 12px, rgba(239,235,226,0.4) 12px, rgba(239,235,226,0.4) 13px)',
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <div>
-      {/* Main featured image */}
+      {/* Hero image area — location label and availability badge live ONLY here */}
       <div className="relative h-64 sm:h-96 bg-[var(--color-ink)] overflow-hidden">
-        <Image
-          src={images[activeIndex]}
-          alt={title}
-          fill
-          priority
-          className="object-cover"
-        />
+        {images.length > 0 ? (
+          <Image
+            src={images[activeIndex]}
+            alt={title}
+            fill
+            priority
+            className="object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                'repeating-linear-gradient(135deg, transparent, transparent 12px, rgba(239,235,226,0.4) 12px, rgba(239,235,226,0.4) 13px)',
+            }}
+          />
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-6 pointer-events-none">
+          <span className="text-[var(--color-paper)] text-sm font-medium tracking-wide uppercase">
+            {location}
+          </span>
+        </div>
+
+        {!isAvailable && (
+          <span className="absolute top-4 right-4 bg-[var(--color-clay)] text-white text-xs font-medium px-2 py-1">
+            Unavailable
+          </span>
+        )}
       </div>
 
-      {/* Thumbnail strip — only shown when there's more than one image */}
+      {/* Thumbnail strip — sits BELOW the hero, fully separate, nothing overlapping it */}
       {images.length > 1 && (
         <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
           {images.map((url, index) => (
