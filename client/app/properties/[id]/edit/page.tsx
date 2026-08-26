@@ -306,7 +306,7 @@ export default function EditPropertyPage() {
 
           {images.length > 1 && (
             <p className="text-xs text-[var(--color-ink)]/40 mb-3">
-              Drag to reorder — the first photo is used as the listing&apos;s main image
+              Drag to reorder - the first photo is used as the listing&apos;s main image
             </p>
           )}
 
