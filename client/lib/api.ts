@@ -505,3 +505,31 @@ export async function deletePropertyImage(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+export async function reorderPropertyImages(
+  id: string,
+  images: string[],
+  token: string
+): Promise<{ success: true; property: Property } | { success: false; error: string }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}/images/reorder`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ images }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to reorder images' };
+    }
+
+    return { success: true, property: data };
+  } catch (err) {
+    console.error('Network error reordering images:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}

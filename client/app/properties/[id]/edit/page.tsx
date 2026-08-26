@@ -7,6 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 import { getProperty, updateProperty } from '@/lib/api';
 import { uploadPropertyImages, deletePropertyImage } from '@/lib/api';
 
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
+import SortableImage from '@/components/SortableImage';
+import { reorderPropertyImages } from '@/lib/api';
+
 export default function EditPropertyPage() {
   const { token } = useAuth();
   const router = useRouter();
@@ -29,6 +34,26 @@ export default function EditPropertyPage() {
 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = images.indexOf(active.id as string);
+    const newIndex = images.indexOf(over.id as string);
+    const newOrder = arrayMove(images, oldIndex, newIndex);
+
+    setImages(newOrder); // update immediately, feels instant
+
+    const result = await reorderPropertyImages(params.id, newOrder, token!);
+    if (!result.success) {
+      setError(result.error);
+      setImages(images); // revert on failure
+    }
+  }
 
   useEffect(() => {
     getProperty(params.id).then((property) => {
@@ -268,20 +293,21 @@ export default function EditPropertyPage() {
           </label>
 
           {images.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              {images.map((url) => (
-                <div key={url} className="relative w-full h-24">
-                  <Image src={url} fill alt="" className="object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteImage(url)}
-                    className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1 z-10"
-                  >
-                    ✕
-                  </button>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={images} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-3 gap-3 mb-3">
+                  {images.map((url, index) => (
+                    <SortableImage key={url} url={url} isFirst={index === 0} onDelete={handleDeleteImage} />
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
+          )}
+
+          {images.length > 1 && (
+            <p className="text-xs text-[var(--color-ink)]/40 mb-3">
+              Drag to reorder — the first photo is used as the listing&apos;s main image
+            </p>
           )}
 
           <label
