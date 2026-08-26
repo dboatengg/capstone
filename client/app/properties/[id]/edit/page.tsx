@@ -105,10 +105,6 @@ export default function EditPropertyPage() {
       setImages(result.property.images);
     }
   }
-  
-  if (isLoading) {
-    return <p className="text-[var(--color-ink)]/60 text-sm">Loading...</p>;
-  }
 
   if (isLoading) {
     return (
@@ -271,12 +267,12 @@ export default function EditPropertyPage() {
   {images.length > 0 && (
     <div className="grid grid-cols-3 gap-3 mb-3">
       {images.map((url) => (
-  <div key={url} className="relative">
-    <Image src={url} fill alt="" className="w-full h-24 object-cover" />
+  <div key={url} className="relative w-full h-24">
+    <Image src={url} fill alt="" className="object-cover" />
     <button
       type="button"
       onClick={() => handleDeleteImage(url)}
-      className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1"
+      className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1 z-10"
     >
       ✕
     </button>
