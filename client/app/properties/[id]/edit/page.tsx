@@ -260,43 +260,73 @@ export default function EditPropertyPage() {
         {error && <p className="text-sm text-[var(--color-clay)]">{error}</p>}
 
         <div>
-  <label className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
-    Photos
-  </label>
+          <label className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
+            Photos
+          </label>
 
-  {images.length > 0 && (
-    <div className="grid grid-cols-3 gap-3 mb-3">
-      {images.map((url) => (
-  <div key={url} className="relative w-full h-24">
-    <Image src={url} fill alt="" className="object-cover" />
-    <button
-      type="button"
-      onClick={() => handleDeleteImage(url)}
-      className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1 z-10"
-    >
-      ✕
-    </button>
-  </div>
-))}
-    </div>
-  )}
+          {images.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              {images.map((url) => (
+                <div key={url} className="relative w-full h-24">
+                  <Image src={url} fill alt="" className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteImage(url)}
+                    className="absolute top-1 right-1 bg-[var(--color-clay)] text-white text-xs px-2 py-1 z-10"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-  <input
-    type="file"
-    accept="image/*"
-    multiple
-    onChange={(e) => setSelectedFiles(Array.from(e.target.files ?? []))}
-    className="w-full border border-[var(--color-stone-line)] px-3 py-2"
-  />
-  <button
-    type="button"
-    onClick={handleUploadImages}
-    disabled={isUploading || selectedFiles.length === 0}
-    className="mt-2 bg-[var(--color-brass)] text-white text-sm font-medium px-4 py-2 disabled:opacity-50"
-  >
-    {isUploading ? 'Uploading...' : 'Upload photos'}
-  </button>
-</div>
+          <label
+            htmlFor="photo-upload"
+            className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[var(--color-stone-line)] hover:border-[var(--color-forest)] transition-colors px-4 py-8 cursor-pointer text-center"
+          >
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-ink)]/40">
+              <path
+                d="M14 18V6M14 6L9 11M14 6L19 11M6 21H22"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-sm font-medium text-[var(--color-ink)]/70">
+              Click to select photos
+            </span>
+            <span className="text-xs text-[var(--color-ink)]/40">
+              You can select multiple images at once
+            </span>
+            <input
+              id="photo-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setSelectedFiles(Array.from(e.target.files ?? []))}
+              className="hidden"
+            />
+          </label>
+
+          {selectedFiles.length > 0 && (
+            <p className="text-sm text-[var(--color-ink)]/70 mt-2">
+              {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={handleUploadImages}
+            disabled={isUploading || selectedFiles.length === 0}
+            className="mt-2 bg-[var(--color-brass)] text-white text-sm font-medium px-4 py-2 disabled:opacity-50"
+          >
+            {isUploading ? 'Uploading...' : 'Upload photos'}
+          </button>
+        </div>
+
+
         <button
           type="submit"
           disabled={isSubmitting}
