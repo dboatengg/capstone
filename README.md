@@ -29,6 +29,7 @@ The frontend is built with **Next.js and React**, while the backend is powered b
 **For agents**
 - Register and manage a personal dashboard
 - Create, edit, and delete their own property listings
+- Upload and manage multiple photos per listing, with a lightbox gallery (pinch/drag zoom support) on the public listing page
 - View and respond to inquiries on their listings, with status tracking (pending → contacted → converted/lost)
 
 **For admins**
@@ -55,6 +56,7 @@ The frontend is built with **Next.js and React**, while the backend is powered b
 - Node.js + Express
 - PostgreSQL + Prisma ORM
 - JWT authentication, bcrypt password hashing, Zod validation
+- Cloudinary + Multer for image upload and storage
 - Deployed on Railway
 
 ---
@@ -143,6 +145,9 @@ npm run dev
 | `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Secret used to sign JWTs |
 | `PORT` | Port the server runs on (default 3000) |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary account cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 
 **Frontend (`client/.env.local`)**
 | Variable | Description |
