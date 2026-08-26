@@ -309,26 +309,64 @@ export default function EditPropertyPage() {
               Drag to reorder - the first photo is used as the listing&apos;s main image
             </p>
           )}
-
           <label
             htmlFor="photo-upload"
-            className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[var(--color-stone-line)] hover:border-[var(--color-forest)] transition-colors px-4 py-8 cursor-pointer text-center"
+            className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed transition-colors px-4 py-8 text-center ${
+              isUploading
+                ? 'border-[var(--color-brass)] bg-[var(--color-brass)]/5 cursor-wait'
+                : 'border-[var(--color-stone-line)] hover:border-[var(--color-forest)] cursor-pointer'
+            }`}
           >
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-ink)]/40">
-              <path
-                d="M14 18V6M14 6L9 11M14 6L19 11M6 21H22"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="text-sm font-medium text-[var(--color-ink)]/70">
-              {isUploading ? 'Uploading...' : 'Click to select photos'}
-            </span>
-            <span className="text-xs text-[var(--color-ink)]/40">
-              You can select multiple images at once
-            </span>
+            {isUploading ? (
+              <>
+                <svg
+                  className="animate-spin text-[var(--color-brass)]"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-90"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-[var(--color-brass)]">
+                  Uploading photos...
+                </span>
+                <span className="text-xs text-[var(--color-ink)]/40">
+                  This may take a moment
+                </span>
+              </>
+            ) : (
+              <>
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-ink)]/40">
+                  <path
+                    d="M14 18V6M14 6L9 11M14 6L19 11M6 21H22"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-[var(--color-ink)]/70">
+                  Click to select photos
+                </span>
+                <span className="text-xs text-[var(--color-ink)]/40">
+                  You can select multiple images at once
+                </span>
+              </>
+            )}
+
             <input
               id="photo-upload"
               type="file"

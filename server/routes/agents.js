@@ -1,5 +1,6 @@
 import express from 'express'
 import prisma from '../db/prisma.js'
+import { upload } from '../config/cloudinary.js'
 import { validateAgentMiddleware, validateUpdateAgentMiddleware } from '../utils/validate.js'
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
 import AppError from '../utils/AppError.js';
@@ -76,6 +77,33 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
 
   await prisma.agent.delete({ where: { id } })
   res.status(204).send()
+})
+
+
+// upload profile image — the agent themselves, or an admin
+router.post('/:id/profile-image', requireAuth, upload.single('profileImage'), async (req, res) => {
+  const { id } = req.params
+  const isOwner = req.user.userId === id
+  const isAdmin = req.user.role === 'admin'
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this profile', 403)
+  }
+
+  const agent = await prisma.agent.findUnique({ where: { id } })
+  if (!agent) throw new AppError('Agent not found', 404)
+
+  if (!req.file) {
+    throw new AppError('No image provided', 400)
+  }
+
+  const updated = await prisma.agent.update({
+    where: { id },
+    data: { profileImage: req.file.path },
+    select: agentSelect,
+  })
+
+  res.json(updated)
 })
 
 export default router
