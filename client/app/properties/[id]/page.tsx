@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getProperty } from '@/lib/api';
 import InquiryForm from '@/components/InquiryForm';
+import PropertyGallery from '@/components/PropertyGallery';
 
 export default async function PropertyDetailPage({
   params,
@@ -43,24 +44,21 @@ export default async function PropertyDetailPage({
           className={`w-2 shrink-0 ${isForRent ? 'bg-[var(--color-forest)]' : 'bg-[var(--color-brass)]'}`}
         />
         <div className="flex-1">
-          <div className="relative h-64 bg-[var(--color-ink)] flex items-end p-6 overflow-hidden">
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage:
-                  'repeating-linear-gradient(135deg, transparent, transparent 12px, rgba(239,235,226,0.4) 12px, rgba(239,235,226,0.4) 13px)',
-              }}
-            />
-            <span className="relative text-[var(--color-paper)] text-sm font-medium tracking-wide uppercase">
+        <div className="relative">
+          <PropertyGallery images={property.images} title={property.title} />
+
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-6 pointer-events-none">
+            <span className="text-[var(--color-paper)] text-sm font-medium tracking-wide uppercase">
               {property.location}
             </span>
-
-            {!property.available && (
-              <span className="absolute top-4 right-4 bg-[var(--color-clay)] text-white text-xs font-medium px-2 py-1">
-                Unavailable
-              </span>
-            )}
           </div>
+
+          {!property.available && (
+            <span className="absolute top-4 right-4 bg-[var(--color-clay)] text-white text-xs font-medium px-2 py-1">
+              Unavailable
+            </span>
+          )}
+        </div>
 
           <div className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
