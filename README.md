@@ -2,7 +2,7 @@
 
 A full-stack real estate platform that connects clients with property agents. Clients can browse and search available properties, while agents can create and manage property listings and respond to inquiries.
 
-The frontend is built with **Next.js and React**, while the backend is powered by **Node.js, Express, PostgreSQL, and Prisma**.
+The frontend is built with **Next.js and React**, and the backend is powered by **Node.js, Express, PostgreSQL, and Prisma**.
 
 ---
 
@@ -95,7 +95,7 @@ Live admin credentials are available on request — reach out at [dicksonboateng
 
 - Frontend fetches from the API using a JWT stored client-side, attached as a `Bearer` token on authenticated requests
 - All authorization is enforced server-side (frontend route guards are UX only, never the real security boundary)
-- Ownership and role checks happen per-route — e.g. an agent can only edit their own listings; an admin can edit any, with the same endpoint branching on `req.user.role`
+- Ownership and role checks happen per-route. e.g. an agent can only edit their own listings; an admin can edit any, with the same endpoint branching on `req.user.role`
 
 ---
 
@@ -195,6 +195,7 @@ capstone/
 │   │   ├── Nav.tsx
 │   │   ├── PropertyCard.tsx
 │   │   ├── PropertyFilters.jsx
+│   │   ├── PropertyGallery.tsx      # Lightbox gallery with zoom/pan
 │   │   └── RequireAuth.tsx
 │   ├── context/
 │   │   └── AuthContext.tsx          # JWT session management
@@ -216,6 +217,8 @@ capstone/
     ├── middleware/
     │   ├── auth.js                  # requireAuth, requireAdmin, requireAgent, requireClient
     │   └── errorHandler.js
+    ├── config/
+    │   └── cloudinary.js             # Cloudinary + Multer upload config
     ├── prisma/
     │   ├── migrations/
     │   ├── schema.prisma
