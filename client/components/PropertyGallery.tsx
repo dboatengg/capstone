@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
@@ -23,13 +23,13 @@ export default function PropertyGallery({
     setIsLightboxOpen(true);
   }
 
-  function showNext() {
+  const showNext = useCallback(() => {
     setActiveIndex((i) => (i + 1) % images.length);
-  }
+  }, [images.length]);
 
-  function showPrev() {
+  const showPrev = useCallback(() => {
     setActiveIndex((i) => (i - 1 + images.length) % images.length);
-  }
+  }, [images.length]);
 
   useEffect(() => {
     if (!isLightboxOpen) return;
@@ -42,7 +42,7 @@ export default function PropertyGallery({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, images.length]);
+  }, [isLightboxOpen, showNext, showPrev]);
 
   return (
     <div>
