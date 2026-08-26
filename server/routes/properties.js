@@ -203,4 +203,42 @@ router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
 })
 
 
+// reorder a property's images - owner agent or admin only
+router.put('/:id/images/reorder', requireAuth, requireAgent, async (req, res) => {
+  const { id } = req.params
+  const { images } = req.body
+  const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
+
+  const property = await prisma.property.findUnique({ where: { id } })
+  if (!property) throw new AppError('Property not found', 404)
+
+  const isOwner = property.agentId === agentId
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this property', 403)
+  }
+
+  if (!Array.isArray(images)) {
+    throw new AppError('images must be an array', 400)
+  }
+
+  const currentSet = new Set(property.images)
+  const newSet = new Set(images)
+  const sameContents =
+    currentSet.size === newSet.size &&
+    [...currentSet].every(url => newSet.has(url))
+
+  if (!sameContents) {
+    throw new AppError('New image order must contain the same images', 400)
+  }
+
+  const updated = await prisma.property.update({
+    where: { id },
+    data: { images },
+    select: propertySelect,
+  })
+
+  res.json(updated)
+})
+
 export default router;
