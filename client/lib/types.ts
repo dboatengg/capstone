@@ -52,6 +52,7 @@ export type AdminAgent = {
   whatsapp: string | null;
   role: string;
   properties: { id: string }[];
+  profileImage: string | null;
 };
 
 export type AdminClient = {
@@ -59,4 +60,5 @@ export type AdminClient = {
   name: string;
   email: string;
   phone: string | null;
+  profileImage: string | null;
 };

@@ -533,3 +533,60 @@ export async function reorderPropertyImages(
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+
+export async function uploadAgentProfileImage(
+  id: string,
+  file: File,
+  token: string
+): Promise<{ success: true; profileImage: string } | { success: false; error: string }> {
+  try {
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents/${id}/profile-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to upload profile image' };
+    }
+
+    return { success: true, profileImage: data.profileImage };
+  } catch (err) {
+    console.error('Network error uploading profile image:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}
+
+export async function uploadClientProfileImage(
+  id: string,
+  file: File,
+  token: string
+): Promise<{ success: true; profileImage: string } | { success: false; error: string }> {
+  try {
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}/profile-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to upload profile image' };
+    }
+
+    return { success: true, profileImage: data.profileImage };
+  } catch (err) {
+    console.error('Network error uploading profile image:', err);
+    return { success: false, error: 'Something went wrong. Please try again.' };
+  }
+}

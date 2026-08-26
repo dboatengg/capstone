@@ -7,7 +7,7 @@ import AppError from '../utils/AppError.js';
 
 const router = express.Router();
 
-const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, role:true, properties: true}
+const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, role:true, profileImage:true, properties: true}
 
 // get all agents
 router.get("/", requireAuth, requireAdmin, async(req, res) => {

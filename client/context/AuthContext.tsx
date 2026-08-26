@@ -8,6 +8,8 @@ type AuthUser = {
   email: string;
   userType: 'agent' | 'client';
   role?: string;
+  profileImage?: string | null;
+
 };
 
 type StoredAuth = {

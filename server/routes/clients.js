@@ -7,7 +7,7 @@ import AppError from '../utils/AppError.js';
 
 const router = express.Router();
 
-const clientSelect = {id:true, name:true, email:true, phone:true,}
+const clientSelect = {id:true, name:true, email:true, phone:true, profileImage:true,}
 
 // get all clients
 router.get("/", requireAuth, requireAdmin, async(req, res) => {

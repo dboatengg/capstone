@@ -55,7 +55,8 @@ router.post('/agent/register', validate(registerSchema), async (req, res) => {
         id: result.agent.id,
         name: result.agent.name,
         email: result.agent.email,
-        role: result.agent.role
+        role: result.agent.role,
+        profileImage: result.agent.profileImage
       },
       token: result.token
     })
@@ -83,7 +84,7 @@ router.post('/agent/login', validate(loginSchema), async (req, res) => {
     )
 
     res.json({
-    agent: { id: agent.id, name: agent.name, email: agent.email, role: agent.role },
+    agent: { id: agent.id, name: agent.name, email: agent.email, role: agent.role, profileImage: agent.profileImage },
     token
     })
 })
@@ -117,6 +118,7 @@ router.post('/client/register', validate(registerSchema), async (req, res) => {
         id: result.client.id,
         name: result.client.name,
         email: result.client.email,
+        profileImage: result.client.profileImage,
       },
       token: result.token
     })
@@ -144,7 +146,7 @@ router.post('/client/login', validate(loginSchema), async (req, res) => {
     )
 
     res.json({
-    client: { id: client.id, name: client.name, email: client.email },
+    client: { id: client.id, name: client.name, email: client.email, profileImage: client.profileImage },
     token
     })
 })
