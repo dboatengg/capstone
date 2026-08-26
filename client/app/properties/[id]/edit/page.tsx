@@ -24,7 +24,6 @@ export default function EditPropertyPage() {
   const [bathrooms, setBathrooms] = useState('');
   const [location, setLocation] = useState('');
   const [available, setAvailable] = useState(true);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
 
@@ -83,20 +82,24 @@ export default function EditPropertyPage() {
     router.push(`/properties/${params.id}`);
   }
 
-  async function handleUploadImages() {
-    if (selectedFiles.length === 0) return;
-    setIsUploading(true);
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
   
-    const result = await uploadPropertyImages(params.id, selectedFiles, token!);
+    setIsUploading(true);
+    setError('');
+  
+    const result = await uploadPropertyImages(params.id, files, token!);
   
     if (result.success) {
       setImages(result.property.images);
-      setSelectedFiles([]);
     } else {
       setError(result.error);
     }
   
     setIsUploading(false);
+  
+    e.target.value = '';
   }
   
   async function handleDeleteImage(imageUrl: string) {
@@ -295,7 +298,7 @@ export default function EditPropertyPage() {
               />
             </svg>
             <span className="text-sm font-medium text-[var(--color-ink)]/70">
-              Click to select photos
+              {isUploading ? 'Uploading...' : 'Click to select photos'}
             </span>
             <span className="text-xs text-[var(--color-ink)]/40">
               You can select multiple images at once
@@ -305,25 +308,11 @@ export default function EditPropertyPage() {
               type="file"
               accept="image/*"
               multiple
-              onChange={(e) => setSelectedFiles(Array.from(e.target.files ?? []))}
+              disabled={isUploading}
+              onChange={handleFileSelect}
               className="hidden"
             />
           </label>
-
-          {selectedFiles.length > 0 && (
-            <p className="text-sm text-[var(--color-ink)]/70 mt-2">
-              {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={handleUploadImages}
-            disabled={isUploading || selectedFiles.length === 0}
-            className="mt-2 bg-[var(--color-brass)] text-white text-sm font-medium px-4 py-2 disabled:opacity-50"
-          >
-            {isUploading ? 'Uploading...' : 'Upload photos'}
-          </button>
         </div>
 
 
