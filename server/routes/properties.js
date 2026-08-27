@@ -202,6 +202,43 @@ router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
   res.json(updated)
 })
 
+// reorder images on a property — owner agent or admin only
+router.put('/:id/images/reorder', requireAuth, requireAgent, async (req, res) => {
+  const { id } = req.params
+  const { images } = req.body
+  const agentId = req.user.userId
+  const isAdmin = req.user.role === 'admin'
+
+  if (!Array.isArray(images) || !images.every(image => typeof image === 'string')) {
+    throw new AppError('Images must be an array of URLs', 400)
+  }
+
+  const property = await prisma.property.findUnique({ where: { id } })
+  if (!property) throw new AppError('Property not found', 404)
+
+  const isOwner = property.agentId === agentId
+  if (!isOwner && !isAdmin) {
+    throw new AppError('You are not authorized to update this property', 403)
+  }
+
+  const existingImages = new Set(property.images)
+  if (
+    images.length !== property.images.length ||
+    new Set(images).size !== existingImages.size ||
+    images.some(image => !existingImages.has(image))
+  ) {
+    throw new AppError('Images must contain the property\'s existing images', 400)
+  }
+
+  const updated = await prisma.property.update({
+    where: { id },
+    data: { images },
+    select: propertySelect,
+  })
+
+  res.json(updated)
+})
+
 
 const MAX_PROPERTY_IMAGES = 12
 

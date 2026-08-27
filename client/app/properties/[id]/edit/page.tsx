@@ -35,6 +35,8 @@ export default function EditPropertyPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const MAX_IMAGES = 12;
+  const remainingSlots = MAX_IMAGES - images.length;
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -111,6 +113,16 @@ export default function EditPropertyPage() {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
   
+    if (files.length > remainingSlots) {
+      setError(
+        remainingSlots <= 0
+          ? `This property already has the maximum of ${MAX_IMAGES} images.`
+          : `You can only add ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} (${MAX_IMAGES} max).`
+      );
+      e.target.value = '';
+      return;
+    }
+  
     setIsUploading(true);
     setError('');
   
@@ -123,7 +135,6 @@ export default function EditPropertyPage() {
     }
   
     setIsUploading(false);
-  
     e.target.value = '';
   }
   
@@ -288,96 +299,118 @@ export default function EditPropertyPage() {
         {error && <p className="text-sm text-[var(--color-clay)]">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-ink)]/70 mb-1">
-            Photos
-          </label>
+  {/* Counter row */}
+  <div className="flex items-center justify-between mb-2">
+    <label className="block text-sm font-medium text-[var(--color-ink)]/70">
+      Photos
+    </label>
+    <span className="text-xs text-[var(--color-ink)]/50">
+      {images.length} of {MAX_IMAGES} uploaded
+      {remainingSlots > 0 && ` · ${remainingSlots} slot${remainingSlots === 1 ? '' : 's'} left`}
+    </span>
+  </div>
 
-          {images.length > 0 && (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={images} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-3 gap-3 mb-3">
-                  {images.map((url, index) => (
-                    <SortableImage key={url} url={url} isFirst={index === 0} onDelete={handleDeleteImage} />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          )}
-
-          {images.length > 1 && (
-            <p className="text-xs text-[var(--color-ink)]/40 mb-3">
-              Drag to reorder - the first photo is used as the listing&apos;s main image
-            </p>
-          )}
-          <label
-            htmlFor="photo-upload"
-            className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed transition-colors px-4 py-8 text-center ${
-              isUploading
-                ? 'border-[var(--color-brass)] bg-[var(--color-brass)]/5 cursor-wait'
-                : 'border-[var(--color-stone-line)] hover:border-[var(--color-forest)] cursor-pointer'
-            }`}
-          >
-            {isUploading ? (
-              <>
-                <svg
-                  className="animate-spin text-[var(--color-brass)]"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-90"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                <span className="text-sm font-medium text-[var(--color-brass)]">
-                  Uploading photos...
-                </span>
-                <span className="text-xs text-[var(--color-ink)]/40">
-                  This may take a moment
-                </span>
-              </>
-            ) : (
-              <>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-ink)]/40">
-                  <path
-                    d="M14 18V6M14 6L9 11M14 6L19 11M6 21H22"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-sm font-medium text-[var(--color-ink)]/70">
-                  Click to select photos
-                </span>
-                <span className="text-xs text-[var(--color-ink)]/40">
-                  You can select multiple images at once
-                </span>
-              </>
-            )}
-
-            <input
-              id="photo-upload"
-              type="file"
-              accept="image/*"
-              multiple
-              disabled={isUploading}
-              onChange={handleFileSelect}
-              className="hidden"
+  {/* Draggable, sortable image thumbnails — only real images are sortable, no empty slots here */}
+  {images.length > 0 && (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={images} strategy={rectSortingStrategy}>
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-1">
+          {images.map((url, index) => (
+            <SortableImage key={url} url={url} isFirst={index === 0} onDelete={handleDeleteImage} />
+          ))}
+          {/* Empty placeholder boxes fill out the remaining slots visually, not draggable */}
+          {Array.from({ length: remainingSlots }).map((_, i) => (
+            <div
+              key={`empty-${i}`}
+              className="w-full aspect-square border border-dashed border-[var(--color-stone-line)]"
             />
-          </label>
+          ))}
         </div>
+      </SortableContext>
+    </DndContext>
+  )}
+
+  {images.length > 1 && (
+    <p className="text-xs text-[var(--color-ink)]/40 mb-3">
+      Drag to reorder - the first photo is used as the listing&apos;s main image
+    </p>
+  )}
+
+  {remainingSlots > 0 ? (
+    <label
+      htmlFor="photo-upload"
+      className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed transition-colors px-4 py-8 text-center ${
+        isUploading
+          ? 'border-[var(--color-brass)] bg-[var(--color-brass)]/5 cursor-wait'
+          : 'border-[var(--color-stone-line)] hover:border-[var(--color-forest)] cursor-pointer'
+      }`}
+    >
+      {isUploading ? (
+        <>
+          <svg
+            className="animate-spin text-[var(--color-brass)]"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-90"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+          <span className="text-sm font-medium text-[var(--color-brass)]">
+            Uploading photos...
+          </span>
+          <span className="text-xs text-[var(--color-ink)]/40">
+            This may take a moment
+          </span>
+        </>
+      ) : (
+        <>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-ink)]/40">
+            <path
+              d="M14 18V6M14 6L9 11M14 6L19 11M6 21H22"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="text-sm font-medium text-[var(--color-ink)]/70">
+            Click to select photos
+          </span>
+          <span className="text-xs text-[var(--color-ink)]/40">
+            You can select multiple images at once
+          </span>
+        </>
+      )}
+
+      <input
+        id="photo-upload"
+        type="file"
+        accept="image/*"
+        multiple
+        disabled={isUploading}
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+    </label>
+  ) : (
+    <p className="text-sm text-[var(--color-ink)]/50 text-center py-4 border border-dashed border-[var(--color-stone-line)]">
+      Maximum of {MAX_IMAGES} images reached. Delete a photo to add a new one.
+    </p>
+  )}
+</div>
 
 
         <button
