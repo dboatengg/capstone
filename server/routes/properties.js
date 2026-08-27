@@ -203,10 +203,11 @@ router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
 })
 
 
-// reorder a property's images - owner agent or admin only
-router.put('/:id/images/reorder', requireAuth, requireAgent, async (req, res) => {
+const MAX_PROPERTY_IMAGES = 12
+
+// upload images to a property - owner agent or admin only
+router.post('/:id/images', requireAuth, requireAgent, upload.array('images', 10), async (req, res) => {
   const { id } = req.params
-  const { images } = req.body
   const agentId = req.user.userId
   const isAdmin = req.user.role === 'admin'
 
@@ -218,23 +219,26 @@ router.put('/:id/images/reorder', requireAuth, requireAgent, async (req, res) =>
     throw new AppError('You are not authorized to update this property', 403)
   }
 
-  if (!Array.isArray(images)) {
-    throw new AppError('images must be an array', 400)
+  if (!req.files || req.files.length === 0) {
+    throw new AppError('No images provided', 400)
   }
 
-  const currentSet = new Set(property.images)
-  const newSet = new Set(images)
-  const sameContents =
-    currentSet.size === newSet.size &&
-    [...currentSet].every(url => newSet.has(url))
-
-  if (!sameContents) {
-    throw new AppError('New image order must contain the same images', 400)
+  const totalAfterUpload = property.images.length + req.files.length
+  if (totalAfterUpload > MAX_PROPERTY_IMAGES) {
+    const remaining = MAX_PROPERTY_IMAGES - property.images.length
+    throw new AppError(
+      remaining <= 0
+        ? `This property already has the maximum of ${MAX_PROPERTY_IMAGES} images`
+        : `You can only add ${remaining} more image${remaining === 1 ? '' : 's'} (${MAX_PROPERTY_IMAGES} max per property)`,
+      400
+    )
   }
+
+  const newImageUrls = req.files.map(file => file.path)
 
   const updated = await prisma.property.update({
     where: { id },
-    data: { images },
+    data: { images: [...property.images, ...newImageUrls] },
     select: propertySelect,
   })
 
