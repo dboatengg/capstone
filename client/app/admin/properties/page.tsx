@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getProperties, deleteProperty } from '@/lib/api';
 import { Property } from '@/lib/types';
 import ConfirmModal from '@/components/ConfirmModal';
+import SearchInput from '@/components/SearchInput';
 
 export default function AdminPropertiesPage() {
   const { token } = useAuth();
@@ -17,6 +18,7 @@ export default function AdminPropertiesPage() {
   const [pendingDelete, setPendingDelete] = useState<Property | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     getProperties().then(setProperties);
@@ -50,6 +52,12 @@ export default function AdminPropertiesPage() {
     ? properties.filter((p) => p.agent.id === agentIdFilter)
     : properties;
 
+    const filteredProperties = visibleProperties.filter((property) =>
+      property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.agent.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
   const filteredAgentName = agentIdFilter
     ? properties.find((p) => p.agent.id === agentIdFilter)?.agent.name
     : null;
@@ -73,6 +81,9 @@ export default function AdminPropertiesPage() {
 
       {error && <p className="text-sm text-[var(--color-clay)] mb-4">{error}</p>}
 
+      <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search properties by title, location, or agent..." />
+
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -86,7 +97,7 @@ export default function AdminPropertiesPage() {
             </tr>
           </thead>
           <tbody>
-            {visibleProperties.map((property) => (
+            {filteredProperties.map((property) => (
               <tr key={property.id} className="border-b border-[var(--color-stone-line)]">
                 <td className="py-3 pr-4 text-[var(--color-ink)]">{property.title}</td>
                 <td className="py-3 pr-4 text-[var(--color-ink)]/70">{property.agent.name}</td>

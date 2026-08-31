@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getClients, deleteClient } from '@/lib/api';
 import { AdminClient } from '@/lib/types';
 import ConfirmModal from '@/components/ConfirmModal';
+import SearchInput from '@/components/SearchInput';
 
 export default function AdminClientsPage() {
   const { token } = useAuth();
@@ -13,6 +14,8 @@ export default function AdminClientsPage() {
   const [pendingDelete, setPendingDelete] = useState<AdminClient | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   useEffect(() => {
     if (!token) return;
@@ -39,6 +42,11 @@ export default function AdminClientsPage() {
     setPendingDelete(null);
   }
 
+  const filteredClients = clients?.filter((client) =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ) ?? [];
+
   if (clients === null) {
     return <p className="text-[var(--color-ink)]/60 text-sm">Loading...</p>;
   }
@@ -51,6 +59,8 @@ export default function AdminClientsPage() {
     <div>
       {error && <p className="text-sm text-[var(--color-clay)] mb-4">{error}</p>}
 
+      <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search clients by name or email..." />
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -62,7 +72,7 @@ export default function AdminClientsPage() {
             </tr>
           </thead>
           <tbody>
-            {clients.map((client) => (
+            {filteredClients.map((client) => (
               <tr key={client.id} className="border-b border-[var(--color-stone-line)]">
                 <td className="py-3 pr-4 text-[var(--color-ink)]">{client.name}</td>
                 <td className="py-3 pr-4 text-[var(--color-ink)]/70">{client.email}</td>

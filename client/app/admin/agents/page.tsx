@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getAgents, deleteAgent } from '@/lib/api';
 import { AdminAgent } from '@/lib/types';
 import ConfirmModal from '@/components/ConfirmModal';
+import SearchInput from '@/components/SearchInput';
 
 export default function AdminAgentsPage() {
   const { user, token } = useAuth();
@@ -13,6 +14,7 @@ export default function AdminAgentsPage() {
   const [pendingDelete, setPendingDelete] = useState<AdminAgent | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -39,6 +41,11 @@ export default function AdminAgentsPage() {
     setPendingDelete(null);
   }
 
+  const filteredAgents = agents?.filter((agent) =>
+    agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    agent.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ) ?? [];
+
   if (agents === null) {
     return <p className="text-[var(--color-ink)]/60 text-sm">Loading...</p>;
   }
@@ -50,6 +57,8 @@ export default function AdminAgentsPage() {
   return (
     <div>
       {error && <p className="text-sm text-[var(--color-clay)] mb-4">{error}</p>}
+
+      <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search agents by name or email..." />
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
@@ -63,18 +72,12 @@ export default function AdminAgentsPage() {
             </tr>
           </thead>
           <tbody>
-            {agents.map((agent) => {
-              const isSelf = agent.id === user?.id;
-              return (
-                <tr key={agent.id} className="border-b border-[var(--color-stone-line)]">
-                  {/* <td className="py-3 pr-4 text-[var(--color-ink)]">
-                    {agent.name}
-                    {isSelf && (
-                      <span className="text-xs text-[var(--color-ink)]/40 ml-2">(you)</span>
-                    )}
-                  </td> */}
-                  <td className="py-3 pr-4 text-[var(--color-ink)]">
-                    <Link
+          {filteredAgents.map((agent) => {
+          const isSelf = agent.id === user?.id;
+            return (
+            <tr key={agent.id} className="border-b border-[var(--color-stone-line)]">
+              <td className="py-3 pr-4 text-[var(--color-ink)]">
+                <Link
                         href={`/admin/properties?agentId=${agent.id}`}
                         className="hover:text-[var(--color-forest)] hover:underline"
                     >
