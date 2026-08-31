@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getClient, updateClient } from '@/lib/api';
+import { getClient, updateClient, uploadClientProfileImage } from '@/lib/api';
+import AvatarUpload from '@/components/AvatarUpload';
 
 export default function AdminEditClientPage() {
   const { token } = useAuth();
@@ -16,6 +17,7 @@ export default function AdminEditClientPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,9 +35,19 @@ export default function AdminEditClientPage() {
       setName(client.name);
       setEmail(client.email);
       setPhone(client.phone ?? '');
+      setProfileImage(client.profileImage ?? null);
       setIsLoading(false);
     });
   }, [params.id, token]);
+
+  async function handleAvatarUpload(file: File) {
+    const result = await uploadClientProfileImage(params.id, file, token!);
+    if (result.success) {
+      setProfileImage(result.profileImage);
+    } else {
+      setError(result.error);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,6 +80,10 @@ export default function AdminEditClientPage() {
   return (
     <div className="max-w-md">
       <h1 className="font-display text-2xl text-[var(--color-ink)] mb-6">Edit client</h1>
+
+      <div className="mb-6">
+        <AvatarUpload currentImage={profileImage} name={name} onUpload={handleAvatarUpload} />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

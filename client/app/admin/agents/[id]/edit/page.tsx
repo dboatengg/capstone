@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getAgent, updateAgent } from '@/lib/api';
+import { getAgent, updateAgent, uploadAgentProfileImage } from '@/lib/api';
+import AvatarUpload from '@/components/AvatarUpload';
 
 export default function AdminEditAgentPage() {
   const { token } = useAuth();
@@ -18,6 +19,7 @@ export default function AdminEditAgentPage() {
   const [phone, setPhone] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [role, setRole] = useState('agent');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,9 +39,19 @@ export default function AdminEditAgentPage() {
       setPhone(agent.phone ?? '');
       setWhatsapp(agent.whatsapp ?? '');
       setRole(agent.role);
+      setProfileImage(agent.profileImage ?? null);
       setIsLoading(false);
     });
   }, [params.id, token]);
+
+  async function handleAvatarUpload(file: File) {
+    const result = await uploadAgentProfileImage(params.id, file, token!);
+    if (result.success) {
+      setProfileImage(result.profileImage);
+    } else {
+      setError(result.error);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -78,6 +90,10 @@ export default function AdminEditAgentPage() {
   return (
     <div className="max-w-md">
       <h1 className="font-display text-2xl text-[var(--color-ink)] mb-6">Edit agent</h1>
+
+      <div className="mb-6">
+        <AvatarUpload currentImage={profileImage} name={name} onUpload={handleAvatarUpload} />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
