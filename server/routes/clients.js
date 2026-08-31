@@ -7,9 +7,10 @@ import AppError from '../utils/AppError.js';
 
 const router = express.Router();
 
+// Prisma select config for client responses
 const clientSelect = {id:true, name:true, email:true, phone:true, profileImage:true,}
 
-// get all clients
+// GET all clients (admin only)
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
   const clients = await prisma.client.findMany({
     select: clientSelect,
@@ -18,7 +19,7 @@ router.get("/", requireAuth, requireAdmin, async(req, res) => {
   res.json(clients);
 })
 
-// get single client — only the client themselves, or an admin, can view this
+// GET single client (owner or admin only)
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params
 
@@ -34,13 +35,13 @@ router.get('/:id', requireAuth, async (req, res) => {
   res.json(client)
 })
 
-// create client
+// POST create new client (admin only)
 router.post('/', requireAuth, requireAdmin, validateClientMiddleware, async (req, res) => {
   const newClient = await prisma.client.create({ data: req.body, select: clientSelect });
   res.status(201).json(newClient);
 })
 
-// update client — only the client themselves, or an admin, can update this
+// PUT update client (owner or admin only)
 router.put('/:id', requireAuth, validateUpdateClientMiddleware, async (req, res) => {
   const { id } = req.params
 
@@ -62,12 +63,13 @@ router.put('/:id', requireAuth, validateUpdateClientMiddleware, async (req, res)
   res.json(updatedClient)
 })
 
-// delete client
+// DELETE client (admin only, check for associated inquiries first)
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params
   const client = await prisma.client.findUnique({ where: { id } })
   if (!client) throw new AppError('Client not found', 404)
 
+  // Check for associated inquiries
   const inquiryCount = await prisma.inquiry.count({ where: { clientId: id } })
   if (inquiryCount > 0) {
     throw new AppError(
@@ -80,8 +82,7 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   res.status(204).send()
 })
 
-
-// upload profile image - the client themselves, or an admin
+// POST upload profile image (owner or admin only)
 router.post('/:id/profile-image', requireAuth, upload.single('profileImage'), async (req, res) => {
   const { id } = req.params
   const isOwner = req.user.userId === id

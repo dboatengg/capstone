@@ -1,11 +1,12 @@
-import express from 'express';      
+import express from 'express';
 import prisma from '../db/prisma.js';
 import { validateInquiryMiddleware, validateUpdateInquiryMiddleware } from '../utils/validate.js';
 import { requireAdmin, requireAuth, requireAgent, requireClient } from '../middleware/auth.js';
 import AppError from '../utils/AppError.js';
 
-const router = express.Router();   
+const router = express.Router();
 
+// Prisma select config for inquiry responses (include property and client details)
 const inquirySelect = {
   id: true,
   message: true,
@@ -22,23 +23,7 @@ const inquirySelect = {
   client: { select: { id: true, name: true, email: true } }
 }
 
-// get all inquiries — scoped to the logged-in agent's own properties
-// router.get('/', requireAuth, requireAgent, async (req, res) => {
-//   const agentId = req.user.userId
-
-//   const inquiries = await prisma.inquiry.findMany({
-//     where: {
-//       property: {
-//         agentId: agentId
-//       }
-//     },
-//     select: inquirySelect
-//   })
-
-//   res.json(inquiries);
-// })
-
-// get all inquiries — admins see everything, agents see only their own properties' inquiries
+// GET all inquiries (admins see all, agents see only their property inquiries)
 router.get('/', requireAuth, requireAgent, async (req, res) => {
   const agentId = req.user.userId
   const isAdmin = req.user.role === 'admin'
@@ -52,7 +37,7 @@ router.get('/', requireAuth, requireAgent, async (req, res) => {
   res.json(inquiries);
 })
 
-// get single inquiry
+// GET single inquiry
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params
   const inquiry = await prisma.inquiry.findUnique({ where: { id }, select: inquirySelect })
@@ -60,13 +45,14 @@ router.get('/:id', requireAuth, async (req, res) => {
   res.json(inquiry);
 })
 
-// create inquiry
+// POST create inquiry (clients only)
 router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (req, res) => {
   const clientId = req.user.userId
   const { propertyId, message } = req.body
 
   const property = await prisma.property.findUnique({ where: { id: propertyId } })
   if (!property) throw new AppError('Property not found', 404)
+  // Prevent inquiries on unavailable properties
   if (!property.available) throw new AppError('This property is no longer available', 400)
 
   try {
@@ -75,6 +61,7 @@ router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (r
     })
     res.status(201).json(inquiry)
   } catch (err) {
+    // Prevent duplicate inquiries from same client for same property
     if (err.code === 'P2002') {
       throw new AppError('You have already sent an inquiry for this property', 400)
     }
@@ -82,7 +69,7 @@ router.post('/', requireAuth, requireClient, validateInquiryMiddleware, async (r
   }
 })
 
-// update inquiry
+// PUT update inquiry (owner agent or admin only)
 router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, async (req, res) => {
   const { id } = req.params
   const agentId = req.user.userId
@@ -108,7 +95,7 @@ router.put('/:id', requireAuth, requireAgent, validateUpdateInquiryMiddleware, a
   res.json(updated)
 })
 
-// delete inquiry
+// DELETE inquiry (admin only)
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params
   const inquiry = await prisma.inquiry.findUnique({ where: { id } })

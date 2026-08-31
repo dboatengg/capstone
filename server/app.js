@@ -10,12 +10,15 @@ import errorHandler from './middleware/errorHandler.js'
 import adminRoutes from './routes/admin.js'
 import cors from 'cors'
 
-// express app setup
+// Initialize Express app
 const app = express();
 
-// middleware
+// MIDDLEWARE
+// Parse JSON request bodies
 app.use(express.json())
+// Log HTTP requests
 app.use(morgan('dev'))
+// Enable CORS for frontend origins
 app.use(cors ({
     origin: [
       'http://localhost:4000',
@@ -24,23 +27,25 @@ app.use(cors ({
     credentials: true
 }))
 
-// Auth routes
+// ROUTES
+// Authentication endpoints
 app.use('/auth', authRoutes);
-
-// routes
+// Resource APIs
 app.use('/api/agents', agentRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/inquiries', inquiryRoutes)
 app.use('/api/properties', propertyRoutes)
 app.use('/api/admin', adminRoutes)
 
-// root route
+// Health check endpoint
 app.get('/', (req, res) => {
     res.send("Welcome to the Capstone API!")
 })
 
+// Centralized error handling
 app.use(errorHandler)
 
+// Global error handlers for unhandled exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err)
   process.exit(1)

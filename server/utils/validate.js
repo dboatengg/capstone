@@ -1,6 +1,6 @@
 import {z} from 'zod'
 
-/***********************Agents**************************/
+// AGENT VALIDATION SCHEMAS
 const agentSchema = z.object({
     name: z.string().min(1, 'Name is required').regex(/^[a-zA-Z\s]+$/, 'Name must contain only letters'),
     email: z.string().email('Invalid email address'),
@@ -11,10 +11,10 @@ const agentSchema = z.object({
 })
 
 const updateAgentSchema = agentSchema.partial();
-
 export const validateAgent = (data) => {return agentSchema.safeParse(data)}
 export const validateUpdateAgent = (data) => {return updateAgentSchema.safeParse(data)}
 
+// Middleware to validate agent data in request body
 export const validateAgentMiddleware = (req, res, next) => {
     const result = validateAgent(req.body);
     if(!result.success) return res.status(400).json({errors: result.error.issues})
@@ -29,7 +29,7 @@ export const validateUpdateAgentMiddleware = (req, res, next) => {
     next();
 }
 
-/***********************Clients**************************/
+// CLIENT VALIDATION SCHEMAS
 const clientSchema = z.object({
     name: z.string().min(1, 'Name is required').regex(/^[a-zA-Z\s]+$/, 'Name must contain only letters'),
     email: z.string().email('Invalid email address'),
@@ -42,6 +42,7 @@ const updateClientSchema = clientSchema.partial();
 export const validateClient = (data) => {return clientSchema.safeParse(data)}
 export const validateUpdateClient = (data) => {return updateClientSchema.safeParse(data)}
 
+// Middleware to validate client data in request body
 export const validateClientMiddleware = (req, res, next) => {
     const result = validateClient(req.body);
     if(!result.success) return res.status(400).json({errors: result.error.issues})
@@ -56,7 +57,7 @@ export const validateUpdateClientMiddleware = (req, res, next) => {
     next();
 }
 
-/***********************Inquiries***********************/
+// INQUIRY VALIDATION SCHEMAS
 const inquirySchema = z.object({
     propertyId: z.string().uuid('Invalid property ID'),
     message: z.string().min(1, 'Message is required'),
@@ -70,6 +71,7 @@ const updateInquirySchema = z.object({
 export const validateInquiry = (data) => {return inquirySchema.safeParse(data)}
 export const validateUpdateInquiry = (data) => {return updateInquirySchema.safeParse(data)}
 
+// Middleware to validate inquiry data
 export const validateInquiryMiddleware = (req, res, next) => {
     const result = validateInquiry(req.body);
     if(!result.success) return res.status(400).json({errors: result.error.issues})
@@ -84,8 +86,7 @@ export const validateUpdateInquiryMiddleware = (req, res, next) => {
     next();
 }
 
-
-/***********************Properties***********************/
+// PROPERTY VALIDATION SCHEMAS
 const propertySchema = z.object({
     title: z.string().min(1, 'Title is required'),
     shortDescription: z.string().min(1, 'Short description is required'),
@@ -105,6 +106,7 @@ const propertySchema = z.object({
 export const validateProperty = (data) => {return propertySchema.safeParse(data)}
 export const validateUpdateProperty = (data) => {return updatePropertySchema.safeParse(data)}
 
+// Middleware to validate property data
 export const validatePropertyMiddleware = (req, res, next) => {
     const result = validateProperty(req.body);
     if(!result.success) return res.status(400).json({errors: result.error.issues})

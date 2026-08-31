@@ -1,5 +1,7 @@
+// API layer for client-server communication
 import { Property, Inquiry, AdminAgent } from './types'
 
+// Property search and filter parameters
 type PropertyFilters = {
   search?: string;
   minPrice?: number;
@@ -8,12 +10,14 @@ type PropertyFilters = {
   bathrooms?: number;
 };
 
+// Fetch properties with optional filters (search, price, bedrooms, bathrooms)
 export async function getProperties(
   filters: PropertyFilters = {}
 ): Promise<Property[] | null> {
   try {
     const params = new URLSearchParams();
 
+    // Build query parameters from filter object
     if (filters.search) {
       params.set('search', filters.search);
     }
@@ -56,6 +60,7 @@ export async function getProperties(
   }
 }
 
+// Fetch single property by ID
 export async function getProperty(id: string): Promise<Property | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
@@ -74,6 +79,7 @@ export async function getProperty(id: string): Promise<Property | null> {
   }
 }
 
+// Input type for property creation/updates
 type CreatePropertyInput = {
   title: string;
   shortDescription: string;
@@ -87,6 +93,7 @@ type CreatePropertyInput = {
   agentId?: string;
 };
 
+// Create new property (agents only)
 export async function createProperty(
   input: CreatePropertyInput,
   token: string
@@ -103,6 +110,7 @@ export async function createProperty(
 
     const data = await res.json();
 
+    // Return error if request failed
     if (!res.ok) {
       const message = data.errors?.[0]?.message || data.error || 'Failed to create property';
       return { success: false, error: message };
@@ -115,6 +123,7 @@ export async function createProperty(
   }
 }
 
+// Create inquiry on property (clients only)
 export async function createInquiry(
   propertyId: string,
   message: string,
@@ -132,6 +141,7 @@ export async function createInquiry(
 
     const data = await res.json();
 
+    // Return error if request failed
     if (!res.ok) {
       const message = data.errors?.[0]?.message || data.error || 'Failed to send inquiry';
       return { success: false, error: message };
@@ -144,6 +154,7 @@ export async function createInquiry(
   }
 }
 
+// Fetch all inquiries (agent/admin only)
 export async function getInquiries(token: string): Promise<Inquiry[] | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
@@ -162,6 +173,7 @@ export async function getInquiries(token: string): Promise<Inquiry[] | null> {
   }
 }
 
+// Update inquiry status (pending/contacted/converted/lost)
 export async function updateInquiryStatus(
   id: string,
   status: string,
@@ -191,6 +203,7 @@ export async function updateInquiryStatus(
   }
 }
 
+// Delete property (owner or admin only)
 export async function deleteProperty(
   id: string,
   token: string
@@ -213,6 +226,7 @@ export async function deleteProperty(
   }
 }
 
+// Update existing property
 export async function updateProperty(
   id: string,
   input: CreatePropertyInput,
@@ -242,7 +256,7 @@ export async function updateProperty(
   }
 }
 
-// 
+// Fetch all agents (admin only)
 export async function getAgents(token: string): Promise<AdminAgent[] | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents`, {
@@ -261,6 +275,7 @@ export async function getAgents(token: string): Promise<AdminAgent[] | null> {
   }
 }
 
+// Delete agent (admin only, checks for associated properties)
 export async function deleteAgent(
   id: string,
   token: string
@@ -285,6 +300,7 @@ export async function deleteAgent(
 
 import { AdminClient } from './types';
 
+// Fetch all clients (admin only)
 export async function getClients(token: string): Promise<AdminClient[] | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients`, {
@@ -303,6 +319,7 @@ export async function getClients(token: string): Promise<AdminClient[] | null> {
   }
 }
 
+// Delete client (admin only, checks for associated inquiries)
 export async function deleteClient(
   id: string,
   token: string
@@ -326,6 +343,7 @@ export async function deleteClient(
 }
 
 
+// Delete inquiry (admin only)
 export async function deleteInquiry(
   id: string,
   token: string
@@ -349,6 +367,7 @@ export async function deleteInquiry(
 }
 
 
+// Input type for agent updates
 type UpdateAgentInput = {
   name: string;
   email: string;
@@ -357,6 +376,7 @@ type UpdateAgentInput = {
   role: string;
 };
 
+// Update agent details (admin only)
 export async function updateAgent(
   id: string,
   input: UpdateAgentInput,
@@ -386,12 +406,14 @@ export async function updateAgent(
   }
 }
 
+// Input type for client updates
 type UpdateClientInput = {
   name: string;
   email: string;
   phone: string | null;
 };
 
+// Update client details (owner or admin only)
 export async function updateClient(
   id: string,
   input: UpdateClientInput,
@@ -422,6 +444,7 @@ export async function updateClient(
 }
 
 
+// Fetch single agent by ID (admin only)
 export async function getAgent(id: string, token: string): Promise<AdminAgent | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agents/${id}`, {
@@ -436,6 +459,7 @@ export async function getAgent(id: string, token: string): Promise<AdminAgent | 
   }
 }
 
+// Fetch single client by ID (admin only)
 export async function getClient(id: string, token: string): Promise<AdminClient | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`, {
@@ -450,6 +474,7 @@ export async function getClient(id: string, token: string): Promise<AdminClient 
   }
 }
 
+// Upload images to property gallery (owner or admin only)
 export async function uploadPropertyImages(
   id: string,
   files: File[],
@@ -457,6 +482,7 @@ export async function uploadPropertyImages(
 ): Promise<{ success: true; property: Property } | { success: false; error: string }> {
   try {
     const formData = new FormData();
+    // Append all files to FormData for multipart upload
     files.forEach((file) => formData.append('images', file));
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}/images`, {
@@ -478,6 +504,7 @@ export async function uploadPropertyImages(
   }
 }
 
+// Delete single image from property
 export async function deletePropertyImage(
   id: string,
   imageUrl: string,
@@ -506,6 +533,7 @@ export async function deletePropertyImage(
   }
 }
 
+// Reorder images on property (for drag/drop support)
 export async function reorderPropertyImages(
   id: string,
   images: string[],
@@ -535,6 +563,7 @@ export async function reorderPropertyImages(
 }
 
 
+// Upload profile image for agent
 export async function uploadAgentProfileImage(
   id: string,
   file: File,
@@ -563,6 +592,7 @@ export async function uploadAgentProfileImage(
   }
 }
 
+// Upload profile image for client
 export async function uploadClientProfileImage(
   id: string,
   file: File,

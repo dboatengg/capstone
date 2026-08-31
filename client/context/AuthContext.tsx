@@ -1,7 +1,9 @@
 'use client';
 
+// Auth context using useSyncExternalStore for client-side authentication state
 import { createContext, useContext, useSyncExternalStore, ReactNode } from 'react';
 
+// User auth data structure
 type AuthUser = {
   id: string;
   name: string;
@@ -17,35 +19,38 @@ type StoredAuth = {
   token: string | null;
 };
 
+// Set of listener functions to notify on auth changes
 const listeners = new Set<() => void>();
 
+// Notify all listeners of auth state change
 function notifyListeners() {
   listeners.forEach((callback) => callback());
 }
 
+// Register listener for auth changes
 function subscribe(callback: () => void) {
   listeners.add(callback);
   return () => listeners.delete(callback);
 }
 
-// A fixed, unchanging object — the server always renders "logged out"
+// Server always returns logged-out (prevents hydration mismatch)
 const SERVER_SNAPSHOT: StoredAuth = { user: null, token: null };
 
 function getServerSnapshot(): StoredAuth {
   return SERVER_SNAPSHOT;
 }
 
-// Cache the last computed snapshot so we only build a NEW object
-// when the underlying localStorage values actually changed.
+// Cache auth snapshot to avoid recreating on every read
 let cachedToken: string | null = null;
 let cachedUserRaw: string | null = null;
 let cachedSnapshot: StoredAuth = SERVER_SNAPSHOT;
 
+// Get current auth from localStorage with caching
 function getSnapshot(): StoredAuth {
   const token = localStorage.getItem('token');
   const userRaw = localStorage.getItem('user');
 
-  // Nothing changed since last read — return the SAME object reference
+  // Return cached snapshot if no changes in localStorage
   if (token === cachedToken && userRaw === cachedUserRaw) {
     return cachedSnapshot;
   }
@@ -56,18 +61,21 @@ function getSnapshot(): StoredAuth {
   return cachedSnapshot;
 }
 
+// Save auth to localStorage and notify listeners
 function setStoredAuth(user: AuthUser, token: string) {
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
   notifyListeners();
 }
 
+// Clear auth from localStorage
 function clearStoredAuth() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   notifyListeners();
 }
 
+// Type for auth context value
 type AuthContextType = {
   user: AuthUser | null;
   token: string | null;
@@ -77,7 +85,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Auth provider component - manages authentication state
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Subscribe to localStorage changes via external store
   const { user, token } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function login(user: AuthUser, token: string) {
@@ -95,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+  // Hook to access auth context (validates provider presence)
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

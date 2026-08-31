@@ -5,9 +5,10 @@ import { validatePropertyMiddleware, validateUpdatePropertyMiddleware } from '..
 import { requireAuth, requireAdmin, requireAgent, requireClient } from '../middleware/auth.js';
 import AppError from '../utils/AppError.js';
 
-const router = express.Router();   
+const router = express.Router();
 
-  const propertySelect = {
+// Prisma select config to include agent details in responses
+const propertySelect = {
     id: true,
     title: true,
     shortDescription: true,
@@ -26,7 +27,7 @@ const router = express.Router();
     }
   }
 
-// get all properties
+// GET all properties with optional filters (search, price range, bedrooms, bathrooms)
 router.get('/', async (req, res) => {
   const {
     search,
@@ -38,7 +39,7 @@ router.get('/', async (req, res) => {
 
   const where = {};
 
-  // Text search: title and location
+  // Search by title or location (case-insensitive)
   if (search) {
     where.OR = [
       {
@@ -56,25 +57,19 @@ router.get('/', async (req, res) => {
     ];
   }
 
-  // Price range
+  // Filter by price range
   if (minPrice || maxPrice) {
     where.price = {};
-
-    if (minPrice) {
-      where.price.gte = Number(minPrice);
-    }
-
-    if (maxPrice) {
-      where.price.lte = Number(maxPrice);
-    }
+    if (minPrice) where.price.gte = Number(minPrice);
+    if (maxPrice) where.price.lte = Number(maxPrice);
   }
 
-  // Bedrooms
+  // Filter by bedroom count
   if (bedrooms) {
     where.bedrooms = Number(bedrooms);
   }
 
-  // Bathrooms
+  // Filter by bathroom count
   if (bathrooms) {
     where.bathrooms = Number(bathrooms);
   }
@@ -90,7 +85,7 @@ router.get('/', async (req, res) => {
 
 
 
-// get single property
+// GET single property by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params
     const property = await prisma.property.findUnique({ where: { id }, select: propertySelect })
@@ -98,87 +93,56 @@ router.get('/:id', async (req, res) => {
     res.json(property)
 })
 
-// create property
+// POST create property (agents only)
 router.post('/', requireAuth, requireAgent, validatePropertyMiddleware, async (req, res) => {
+    // Auto-assign property to authenticated agent
     const agentId = req.user.userId
     const property = await prisma.property.create({ data: { ...req.body, agentId } })
     res.status(201).json(property);
 })
 
-// update property
+// PUT update property (owner agent or admin)
 router.put('/:id', requireAuth, requireAgent, validateUpdatePropertyMiddleware, async (req, res) => {
-  const { id } = req.params
-  const agentId = req.user.userId
-  const isAdmin = req.user.role === 'admin'
+  const { id } = req.params;
+  const agentId = req.user.userId;
+  const isAdmin = req.user.role === 'admin';
 
-  const property = await prisma.property.findUnique({ where: { id } })
-  if (!property) throw new AppError('Property not found', 404)
+  const property = await prisma.property.findUnique({ where: { id } });
+  if (!property) throw new AppError('Property not found', 404);
 
-  const isOwner = property.agentId === agentId
-
+  const isOwner = property.agentId === agentId;
   if (!isOwner && !isAdmin) {
-    throw new AppError('You are not authorized to update this property', 403)
+    throw new AppError('You are not authorized to update this property', 403);
   }
 
-  // only an admin may reassign a property to a different agent
-  const data = { ...req.body }
-  if (!isAdmin) {
-    delete data.agentId
-  }
+  // Prevent agents from reassigning to different agents (admin only)
+  const data = { ...req.body };
+  if (!isAdmin) delete data.agentId;
 
-  const updated = await prisma.property.update({ where: { id }, data, select: propertySelect })
-  res.json(updated)
-})
+  const updated = await prisma.property.update({ where: { id }, data, select: propertySelect });
+  res.json(updated);
+});
 
-// delete property — admin can delete any property, agent can only delete their own
+// DELETE property (admin can delete any, agent can only delete their own)
 router.delete('/:id', requireAuth, requireAgent, async (req, res) => {
-  const { id } = req.params
-  const property = await prisma.property.findUnique({ where: { id }, select: propertySelect })
-  if (!property) throw new AppError('Property not found', 404)
+  const { id } = req.params;
+  const property = await prisma.property.findUnique({ where: { id }, select: propertySelect });
+  if (!property) throw new AppError('Property not found', 404);
 
-  const isOwner = property.agent.id === req.user.userId
-  const isAdmin = req.user.role === 'admin'
+  const isOwner = property.agent.id === req.user.userId;
+  const isAdmin = req.user.role === 'admin';
 
   if (!isOwner && !isAdmin) {
-    throw new AppError('You are not authorized to delete this property', 403)
+    throw new AppError('You are not authorized to delete this property', 403);
   }
 
-  await prisma.property.delete({ where: { id } })
+  await prisma.property.delete({ where: { id } });
   res.status(204).send();
-})
+});
 
 
 
-// upload images to a property — owner agent or admin only
-router.post('/:id/images', requireAuth, requireAgent, upload.array('images', 10), async (req, res) => {
-  const { id } = req.params
-  const agentId = req.user.userId
-  const isAdmin = req.user.role === 'admin'
-
-  const property = await prisma.property.findUnique({ where: { id } })
-  if (!property) throw new AppError('Property not found', 404)
-
-  const isOwner = property.agentId === agentId
-  if (!isOwner && !isAdmin) {
-    throw new AppError('You are not authorized to update this property', 403)
-  }
-
-  if (!req.files || req.files.length === 0) {
-    throw new AppError('No images provided', 400)
-  }
-
-  const newImageUrls = req.files.map(file => file.path)
-
-  const updated = await prisma.property.update({
-    where: { id },
-    data: { images: [...property.images, ...newImageUrls] },
-    select: propertySelect,
-  })
-
-  res.json(updated)
-})
-
-// remove a single image from a property — owner agent or admin only
+// DELETE remove single image from property (owner agent or admin)
 router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
   const { id } = req.params
   const { imageUrl } = req.body
@@ -197,52 +161,54 @@ router.delete('/:id/images', requireAuth, requireAgent, async (req, res) => {
     where: { id },
     data: { images: property.images.filter(img => img !== imageUrl) },
     select: propertySelect,
-  })
+  });
 
-  res.json(updated)
-})
+  res.json(updated);
+});
 
-// reorder images on a property — owner agent or admin only
+// PUT reorder images on property (owner agent or admin)
 router.put('/:id/images/reorder', requireAuth, requireAgent, async (req, res) => {
   const { id } = req.params
   const { images } = req.body
   const agentId = req.user.userId
   const isAdmin = req.user.role === 'admin'
 
+  // Validate images array format
   if (!Array.isArray(images) || !images.every(image => typeof image === 'string')) {
-    throw new AppError('Images must be an array of URLs', 400)
+    throw new AppError('Images must be an array of URLs', 400);
   }
 
-  const property = await prisma.property.findUnique({ where: { id } })
-  if (!property) throw new AppError('Property not found', 404)
+  const property = await prisma.property.findUnique({ where: { id } });
+  if (!property) throw new AppError('Property not found', 404);
 
-  const isOwner = property.agentId === agentId
+  const isOwner = property.agentId === agentId;
   if (!isOwner && !isAdmin) {
-    throw new AppError('You are not authorized to update this property', 403)
+    throw new AppError('You are not authorized to update this property', 403);
   }
 
-  const existingImages = new Set(property.images)
+  // Verify new order contains all existing images (no adds/removes, only reordering)
+  const existingImages = new Set(property.images);
   if (
     images.length !== property.images.length ||
     new Set(images).size !== existingImages.size ||
     images.some(image => !existingImages.has(image))
   ) {
-    throw new AppError('Images must contain the property\'s existing images', 400)
+    throw new AppError('Images must contain the property\'s existing images', 400);
   }
 
   const updated = await prisma.property.update({
     where: { id },
     data: { images },
     select: propertySelect,
-  })
+  });
 
-  res.json(updated)
-})
+  res.json(updated);
+});
 
+// Max images per property for storage/performance
+const MAX_PROPERTY_IMAGES = 12;
 
-const MAX_PROPERTY_IMAGES = 12
-
-// upload images to a property - owner agent or admin only
+// POST upload images to property with max limit validation (owner agent or admin)
 router.post('/:id/images', requireAuth, requireAgent, upload.array('images', 10), async (req, res) => {
   const { id } = req.params
   const agentId = req.user.userId
@@ -257,29 +223,30 @@ router.post('/:id/images', requireAuth, requireAgent, upload.array('images', 10)
   }
 
   if (!req.files || req.files.length === 0) {
-    throw new AppError('No images provided', 400)
+    throw new AppError('No images provided', 400);
   }
 
-  const totalAfterUpload = property.images.length + req.files.length
+  // Enforce image limit
+  const totalAfterUpload = property.images.length + req.files.length;
   if (totalAfterUpload > MAX_PROPERTY_IMAGES) {
-    const remaining = MAX_PROPERTY_IMAGES - property.images.length
+    const remaining = MAX_PROPERTY_IMAGES - property.images.length;
     throw new AppError(
       remaining <= 0
         ? `This property already has the maximum of ${MAX_PROPERTY_IMAGES} images`
         : `You can only add ${remaining} more image${remaining === 1 ? '' : 's'} (${MAX_PROPERTY_IMAGES} max per property)`,
       400
-    )
+    );
   }
 
-  const newImageUrls = req.files.map(file => file.path)
+  const newImageUrls = req.files.map(file => file.path);
 
   const updated = await prisma.property.update({
     where: { id },
     data: { images: [...property.images, ...newImageUrls] },
     select: propertySelect,
-  })
+  });
 
-  res.json(updated)
-})
+  res.json(updated);
+});
 
 export default router;

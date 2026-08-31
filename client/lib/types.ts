@@ -6,6 +6,7 @@ export type Agent = {
   whatsapp: string | null;
 };
 
+// Property listing data structure
 export type Property = {
   id: string;
   title: string;
@@ -23,6 +24,7 @@ export type Property = {
   images: string[];
 };
 
+// Inquiry on a property from a client
 export type Inquiry = {
   id: string;
   message: string;
@@ -44,6 +46,7 @@ export type Inquiry = {
   };
 };
 
+// Admin-accessible agent data
 export type AdminAgent = {
   id: string;
   name: string;
@@ -55,6 +58,7 @@ export type AdminAgent = {
   profileImage: string | null;
 };
 
+// Admin-accessible client data
 export type AdminClient = {
   id: string;
   name: string;

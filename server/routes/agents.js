@@ -7,9 +7,10 @@ import AppError from '../utils/AppError.js';
 
 const router = express.Router();
 
+// Prisma select config for agent responses
 const agentSelect = {id:true, name:true, email:true, phone:true, whatsapp:true, role:true, profileImage:true, properties: true}
 
-// get all agents
+// GET all agents (admin only)
 router.get("/", requireAuth, requireAdmin, async(req, res) => {
   const agents = await prisma.agent.findMany({
     select: agentSelect,
@@ -18,7 +19,7 @@ router.get("/", requireAuth, requireAdmin, async(req, res) => {
   res.json(agents);
 })
 
-// get single agent — public-ish; contact info is meant to be visible (matches property listings)
+// GET single agent by ID (contact info is visible on property listings)
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params
   const agent = await prisma.agent.findUnique({ where: { id }, select: agentSelect })
@@ -26,13 +27,13 @@ router.get('/:id', requireAuth, async (req, res) => {
   res.json(agent)
 })
 
-// create agent
+// POST create new agent (admin only)
 router.post('/', requireAuth, requireAdmin, validateAgentMiddleware, async (req, res) => {
   const newAgent = await prisma.agent.create({ data: req.body, select: agentSelect });
   res.status(201).json(newAgent);
 })
 
-// update agent — only the agent themselves, or an admin, can update this
+// PUT update agent (owner or admin only)
 router.put('/:id', requireAuth, validateUpdateAgentMiddleware, async (req, res) => {
   const { id } = req.params
 
@@ -46,8 +47,7 @@ router.put('/:id', requireAuth, validateUpdateAgentMiddleware, async (req, res) 
   const agent = await prisma.agent.findUnique({ where: { id } })
   if (!agent) throw new AppError('Agent not found', 404)
 
-  // only an admin may change role — strip it out of the request body otherwise,
-  // so an agent can't self-promote by sneaking { role: "admin" } into a normal update
+  // Prevent role self-promotion (admin-only field)
   const data = { ...req.body }
   if (!isAdmin) {
     delete data.role
@@ -61,12 +61,13 @@ router.put('/:id', requireAuth, validateUpdateAgentMiddleware, async (req, res) 
   res.json(updatedAgent)
 })
 
-// delete agent
+// DELETE agent (admin only, check for associated properties first)
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params
   const agent = await prisma.agent.findUnique({ where: { id } })
   if (!agent) throw new AppError('Agent not found', 404)
 
+  // Check for associated properties
   const propertyCount = await prisma.property.count({ where: { agentId: id } })
   if (propertyCount > 0) {
     throw new AppError(
@@ -79,8 +80,7 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   res.status(204).send()
 })
 
-
-// upload profile image — the agent themselves, or an admin
+// POST upload profile image (owner or admin only)
 router.post('/:id/profile-image', requireAuth, upload.single('profileImage'), async (req, res) => {
   const { id } = req.params
   const isOwner = req.user.userId === id
