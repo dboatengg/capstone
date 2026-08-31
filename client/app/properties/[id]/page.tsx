@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getProperty } from '@/lib/api';
 import InquiryForm from '@/components/InquiryForm';
 import PropertyGallery from '@/components/PropertyGallery';
+import PropertyOwnerActions from '@/components/PropertyOwnerActions';
 
 export default async function PropertyDetailPage({
   params,
@@ -38,6 +39,9 @@ export default async function PropertyDetailPage({
       >
         {backLabel}
       </Link>
+
+      <PropertyOwnerActions propertyId={property.id} ownerAgentId={property.agent.id} propertyTitle={property.title}/>
+
       {/* Header block — mirrors the card's colored edge + image treatment */}
       <div className="flex border border-[var(--color-stone-line)] overflow-hidden">
         <div
