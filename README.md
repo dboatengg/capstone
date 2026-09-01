@@ -36,7 +36,7 @@ The frontend is built with **Next.js and React**, and the backend is powered by 
 - Full platform oversight: manage all agents, clients, properties, and inquiries
 - Reassign properties between agents
 - Edit any agent or client profile, including role changes
-- Safeguards against destructive actions — e.g. can't delete an agent with active listings, or a client with inquiries on record
+- Safeguards against destructive actions. e.g. Can't delete an agent with active listings, or a client with inquiries on record
 
 **Platform-wide**
 - JWT-based authentication with role-based access control (client / agent / admin)
@@ -87,7 +87,7 @@ still has active listings, or a client with inquiries on record.
 
 ### Admin access
 
-Live admin credentials are available on request — reach out at [dicksonboateng@proton.me](mailto:dicksonboateng@proton.me) and I'll share login details for a walkthrough.
+Live admin credentials are available on request. Reach out to me at [dicksonboateng@proton.me](mailto:dicksonboateng@proton.me) and I'll share a test login details for a walkthrough.
 
 ---
 
