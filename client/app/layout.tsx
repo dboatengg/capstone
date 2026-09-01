@@ -1,6 +1,7 @@
 import { Fraunces, IBM_Plex_Sans } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
 import Nav from '@/components/Nav';
+import ColdStartNotice from '@/components/ColdStartNotice';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <Nav />
           {children}
+          <ColdStartNotice />
         </AuthProvider>
       </body>
     </html>
