@@ -47,7 +47,7 @@ export default function ColdStartNotice() {
           <p className="text-xs text-[var(--color-ink)]/60 leading-relaxed">
             This project runs on Railway&apos;s free plan, so the backend can spin
             down after inactivity. If something doesn&apos;t load right away, wait
-            10-15 seconds and try again. It just needs a moment to wake up.
+            5-8 seconds and try again. It just needs a moment to wake up.
           </p>
         </div>
         <button
