@@ -28,14 +28,17 @@ The frontend is built with **Next.js and React**, and the backend is powered by 
 
 **For agents**
 - Register and manage a personal dashboard
-- Create, edit, and delete their own property listings
-- Upload and manage multiple photos per listing, with a lightbox gallery (pinch/drag zoom support) on the public listing page
+- Create, edit, and delete their own property listings, with inline edit/delete controls directly on the property detail page
+- Upload and manage multiple photos per listing (drag-to-reorder, 12-image cap), with a lightbox gallery (pinch/drag zoom support) on the public listing page
+- Upload a profile photo
+- Search their own listings by title or location
 - View and respond to inquiries on their listings, with status tracking (pending → contacted → converted/lost)
 
 **For admins**
 - Full platform oversight: manage all agents, clients, properties, and inquiries
-- Reassign properties between agents
+- Reassign properties between agents, manage listing photos, and upload profile photos on behalf of any agent or client
 - Edit any agent or client profile, including role changes
+- Search across properties, agents, and clients
 - Safeguards against destructive actions. e.g. Can't delete an agent with active listings, or a client with inquiries on record
 
 **Platform-wide**
@@ -84,6 +87,14 @@ still has active listings, or a client with inquiries on record.
 
 ![Admin agents](client/public/capstone/capstone-4.png)
 ![Admin clients](client/public/capstone/capstone-5.png)
+
+### Image management
+
+Agents can upload multiple photos per listing with drag-to-reorder (the 
+first photo becomes the listing's main image), up to 12 images per 
+property. Both agents and admins can upload profile photos. The public 
+listing page displays photos in a lightbox gallery with pinch-to-zoom 
+and pan support.
 
 ### Admin access
 
@@ -189,14 +200,19 @@ capstone/
 │   │   ├── layout.tsx                  # Root layout
 │   │   └── page.tsx                     # Public homepage
 │   ├── components/
+│   │   ├── AvatarUpload.tsx          # Profile photo upload with initials fallback
+│   │   ├── ColdStartNotice.tsx       # Dismissible free-tier hosting notice
 │   │   ├── ConfirmModal.tsx
 │   │   ├── InquiryCard.tsx
 │   │   ├── InquiryForm.tsx
 │   │   ├── Nav.tsx
 │   │   ├── PropertyCard.tsx
 │   │   ├── PropertyFilters.jsx
-│   │   ├── PropertyGallery.tsx      # Lightbox gallery with zoom/pan
-│   │   └── RequireAuth.tsx
+│   │   ├── PropertyGallery.tsx       # Lightbox gallery with zoom/pan
+│   │   ├── PropertyOwnerActions.tsx  # Inline edit/delete on the detail page
+│   │   ├── RequireAuth.tsx
+│   │   ├── SearchInput.tsx           # Reusable search box
+│   │   └── SortableImage.tsx         # Drag-and-drop image thumbnail
 │   ├── context/
 │   │   └── AuthContext.tsx          # JWT session management
 │   ├── hooks/
