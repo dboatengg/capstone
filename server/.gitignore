@@ -3,10 +3,11 @@ node_modules
 /generated/prisma
 
 .env
+.env.local
+.env.test
 logs
 .cursor
 .claude
 .windsurf
 .agents
 skills-lock.json
-.env.local
