@@ -9,8 +9,10 @@
     "build": "npx prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e:seed": "node tests/scripts/seed-e2e.js",
     "test:env:init": "node tests/scripts/init-test-env.js",
-    "test:setup": "node tests/scripts/init-test-env.js && node tests/scripts/migrate-test-db.js"
+    "test:setup": "node tests/scripts/init-test-env.js && node tests/scripts/migrate-test-db.js",
+    "test:e2e": "npm run test:e2e --prefix ../client"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
