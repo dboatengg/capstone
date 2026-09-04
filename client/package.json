@@ -6,7 +6,9 @@
     "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test -c playwright.config.mjs",
+    "test:e2e:ui": "playwright test -c playwright.config.mjs --ui"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -19,6 +21,8 @@
     "react-zoom-pan-pinch": "^4.0.4"
   },
   "devDependencies": {
+    "dotenv": "^17.4.2",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
