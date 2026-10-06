@@ -1,0 +1,18 @@
+{
+    "services": {
+      "client": {
+        "root": "client/",
+        "framework": "nextjs"
+      },
+      "server": {
+        "root": "server/",
+        "entrypoint": "app.js",
+        "framework": "express"
+      }
+    },
+    "rewrites": [
+      { "source": "/auth/(.*)",   "destination": { "service": "server" } },
+      { "source": "/api/(.*)",    "destination": { "service": "server" } },
+      { "source": "/(.*)",        "destination": { "service": "client" } }
+    ]
+  }

@@ -19,12 +19,17 @@ app.use(express.json())
 // Log HTTP requests
 app.use(morgan('dev'))
 // Enable CORS for frontend origins
-app.use(cors ({
-    origin: [
-      'http://localhost:4000',
-      'https://capstonne.vercel.app' 
-    ], 
-    credentials: true
+// app.use(cors ({
+//     origin: [
+//       'http://localhost:4000',
+//       'https://capstonne.vercel.app' 
+//     ], 
+//     credentials: true
+// }))
+
+app.use(cors({
+  origin: true,
+  credentials: true
 }))
 
 // ROUTES
