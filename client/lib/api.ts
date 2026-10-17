@@ -1,6 +1,33 @@
 // API layer for client-server communication
 import { Property, Inquiry, AdminAgent } from './types'
 
+const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+
+function getServerOrigin() {
+  return process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:4000';
+}
+
+function getApiUrl(path: string) {
+  const url = `${apiBaseUrl}${path}`;
+
+  return typeof window === 'undefined' && url.startsWith('/')
+    ? `${getServerOrigin()}${url}`
+    : url;
+}
+
+export function getAuthUrl(path: string) {
+  const authBaseUrl = apiBaseUrl.endsWith('/api')
+    ? apiBaseUrl.slice(0, -4)
+    : apiBaseUrl;
+  const url = `${authBaseUrl}/auth${path}`;
+
+  return typeof window === 'undefined' && url.startsWith('/')
+    ? `${getServerOrigin()}${url}`
+    : url;
+}
+
 // Property search and filter parameters
 type PropertyFilters = {
   search?: string;
@@ -40,7 +67,7 @@ export async function getProperties(
 
     const queryString = params.toString();
 
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/properties${
+    const url = `${getApiUrl('/properties')}${
       queryString ? `?${queryString}` : ''
     }`;
 
@@ -63,7 +90,7 @@ export async function getProperties(
 // Fetch single property by ID
 export async function getProperty(id: string): Promise<Property | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
+    const res = await fetch(getApiUrl(`/properties/${id}`), {
       cache: 'no-store',
     });
 

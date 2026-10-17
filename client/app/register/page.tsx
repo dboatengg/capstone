@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { getAuthUrl } from '@/lib/api';
 
 export default function RegisterPage() {
   const [userType, setUserType] = useState<'agent' | 'client'>('agent');
@@ -21,14 +22,11 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/auth/${userType}/register`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password }),
-        }
-      );
+      const res = await fetch(getAuthUrl(`/${userType}/register`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
 
       const data = await res.json();
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { getAuthUrl } from '@/lib/api';
 
 export default function LoginPage() {
   const [userType, setUserType] = useState<'agent' | 'client'>('agent');
@@ -21,14 +22,11 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/auth/${userType}/login`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch(getAuthUrl(`/${userType}/login`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
 
