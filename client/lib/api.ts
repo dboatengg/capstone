@@ -1,7 +1,10 @@
 // API layer for client-server communication
 import { Property, Inquiry, AdminAgent } from './types'
 
-const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+const configuredApiUrl = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
+const apiBaseUrl = configuredApiUrl.endsWith('/api')
+  ? configuredApiUrl
+  : `${configuredApiUrl}/api`;
 
 function getServerOrigin() {
   return process.env.VERCEL_URL
