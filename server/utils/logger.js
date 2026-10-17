@@ -1,24 +1,28 @@
 import winston from 'winston'
 
-// Configure Winston logger with console and file transports
+// Vercel's function filesystem is read-only, so production logs must go to
+// stdout/stderr. Keep file transports for local development only.
+const transports = [new winston.transports.Console()]
+
+if (!process.env.VERCEL) {
+    transports.push(
+        new winston.transports.File({
+            filename: 'logs/error.log',
+            level: 'error'
+        }),
+        new winston.transports.File({
+            filename: 'logs/combined.log'
+        })
+    )
+}
+
 const logger = winston.createLogger({
     level:'info',
     format:winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
     ),
-    transports:[
-        new winston.transports.Console(),
-        // Log errors to separate file
-        new winston.transports.File({
-            filename:'logs/error.log',
-            level:'error'
-        }),
-        // Log all messages to combined file
-        new winston.transports.File({
-            filename:'logs/combined.log'
-        })
-    ]
+    transports
 })
 
 export default logger;
